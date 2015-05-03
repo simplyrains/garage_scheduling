@@ -1,0 +1,83 @@
+====== Technician ======== / technician
+
+- tech_id
+- tech_fullname
+- tech_signdate
+- tech_resigndate
+- tech_holiday
+- tech_exholiday
+- tech_main_station
+- tech_skill{
+		- skill
+		- station (note: can be ref form skill) TODO
+		- level
+} *ref - work
+
+====== Car ===============
+
++insurance TODO
+- tell_history{
+	- bpj_no		string
+	- tell_time		date
+	- tell_desc		string
+} *ref tell_history
+
+====== Insurance ========= << ENUM?
+
+- insurance_id
+- insurance_name
+
+====== Job =============== / job_detail
+
+- bpj_no 			string
+- bpe_no			string
+- start_dt			date
+- sa_id				object_ref SA
+- car_id			object_ref Car
+- car_type			enum
+- work_type			enum
+- topserv_hr		number
+- backorder_part{
+	- name 			string
+	- station 		string
+	- arrival		datetime
+}
+
+====== Customer ========== / customer_car
+
+- car 				arr[] of object_ref
+- customer_name		string
+- customer_tel		string
+- model				ENUM/string
+x colour_id			string // ENUM
+
+====== SA =============== / SA
+
+- sa_id
+- sa_nickname
+- sa_fullname
+- sa_tel
+- sa_signdate
+- sa_resigndate
+
+====== Task =============
+
+- tech_ref			object_red Technician
+- start_time		date
+- duration			date(number?)
+- note				string
+- locked			boolean
+
+
+>>>>>>>>>> IGNORED
+
+- car_model -> ENUM
+- car_colour -> universal toyota color
+
+
+>>>>>>>>>> LATER
+- ot
+- extra_holiday
+- งานซ่อมเพิ่มเติม
+- งานตีกลับภายนอก
+- 
