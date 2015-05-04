@@ -1,0 +1,16 @@
+<section data-ng-controller="TechniciansController" data-ng-init="findOne()">
+	<div class="page-header">
+		<h1 data-ng-bind="technician.name"></h1>
+		<p>{{technician.name2}}</p>
+	</div>
+	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == technician.user._id))">
+		<a class="btn btn-primary" href="/#!/technicians/{{technician._id}}/edit">
+			<i class="glyphicon glyphicon-edit"></i>
+		</a>
+		<a class="btn btn-primary" data-ng-click="remove();">
+			<i class="glyphicon glyphicon-trash"></i>
+		</a>
+	</div>
+	<small>
+	</small>
+</section>

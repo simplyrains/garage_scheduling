@@ -5,27 +5,30 @@
 - tech_signdate
 - tech_resigndate
 - tech_holiday
-- tech_exholiday
+- tech_exholidays{
+		- date
+		- duration (date)
+}
 - tech_main_station
-- tech_skill{
+- tech_skills{
 		- skill
 		- station (note: can be ref form skill) TODO
 		- level
 } *ref - work
 
-====== Car ===============
+====== SA =============== / SA
 
-+insurance TODO
-- tell_history{
-	- bpj_no		string
-	- tell_time		date
-	- tell_desc		string
-} *ref tell_history
+- sa_id
+- sa_nickname
+- sa_fullname
+- sa_tel
+- sa_signdate
+- sa_resigndate
 
-====== Insurance ========= << ENUM?
+====== Insurance =========
 
-- insurance_id
 - insurance_name
+- insurance_tell
 
 ====== Job =============== / job_detail
 
@@ -43,22 +46,21 @@
 	- arrival		datetime
 }
 
-====== Customer ========== / customer_car
+====== Car ============== / customer_car
 
 - car 				arr[] of object_ref
 - customer_name		string
 - customer_tel		string
-- model				ENUM/string
-x colour_id			string // ENUM
-
-====== SA =============== / SA
-
-- sa_id
-- sa_nickname
-- sa_fullname
-- sa_tel
-- sa_signdate
-- sa_resigndate
+- model				object_ref
+- insurance 		object_ref
+- name_plate		string
+- model_id			string
+- colour_id			string
+- tell_history{
+	- bpj_no		string
+	- tell_time		date
+	- tell_desc		string
+} *ref tell_history
 
 ====== Task =============
 
@@ -67,7 +69,6 @@ x colour_id			string // ENUM
 - duration			date(number?)
 - note				string
 - locked			boolean
-
 
 >>>>>>>>>> IGNORED
 

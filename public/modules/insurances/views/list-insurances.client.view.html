@@ -1,0 +1,19 @@
+<section data-ng-controller="InsurancesController" data-ng-init="find()">
+    <div class="page-header">
+        <h1>Insurances</h1>
+    </div>
+    <div class="list-group">
+        <a data-ng-repeat="insurance in insurances" data-ng-href="#!/insurances/{{insurance._id}}" class="list-group-item">
+			<small class="list-group-item-text">
+				Posted on
+				<span data-ng-bind="insurance.created | date:'medium'"></span>
+				by
+				<span data-ng-bind="insurance.user.displayName"></span>
+			</small>
+			<h4 class="list-group-item-heading" data-ng-bind="insurance.name"></h4>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" data-ng-hide="!insurances.$resolved || insurances.length">
+    	No Insurances yet, why don't you <a href="/#!/insurances/create">create one</a>?
+    </div>
+</section>

@@ -1,0 +1,82 @@
+<section data-ng-controller="TechniciansController" data-ng-init="findOne()">
+    <div class="page-header">
+        <h1>Edit Technician</h1>
+    </div>
+    <div class="col-md-12">
+        <form class="form-horizontal" data-ng-submit="update()" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <label class="control-label" for="tech_id">tech_id</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="technician.tech_id" id="tech_id" class="form-control" placeholder="tech_id" required>
+                    </div>
+                    <label class="control-label" for="tech_fullname">tech_fullname</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="technician.tech_fullname" id="tech_fullname" class="form-control" placeholder="tech_fullname" required>
+                    </div>
+
+                    <label class="control-label" for="tech_signdate">tech_signdate</label>
+                    <div class="controls">
+                        <input type="date" data-ng-model="technician.tech_signdate" id="tech_signdate" class="form-control" placeholder="tech_signdate" required>
+                    </div>
+
+
+                    <label class="control-label">tech_resigndate</label>
+                    <div class="controls row">
+                        <div class="col-md-3">
+                            <label class="control-label" for="tech_is_resign">ลาออก?</label>
+
+                            <input type="checkbox" data-ng-model="technician.tech_is_resign" id="tech_is_resign" class="form-control">
+                        </div>
+                        <div class="col-md-9">
+                            <label class="control-label" for="tech_resigndate">วันที่ออก</label>
+
+                            <input type="date" data-ng-model="technician.tech_resigndate" id="tech_resigndate" class="form-control" placeholder="tech_resigndate">
+                        </div>
+                    </div>
+                    <label class="control-label" for="tech_holiday">tech_holiday</label>
+                    <div class="controls">
+                        <select ng-model="technician.tech_holiday" ng-options="holiday.id as holiday.name for holiday in holidayChoice">
+                          <option value="">-- เลือกวันหยุด --</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label" for="tech_main_station">tech_main_station</label>
+                    <div class="controls">
+                        <select ng-model="technician.tech_main_station" ng-options="factory.id as factory.name for factory in factoryChoice">
+                          <option value="">-- เลือกสถานีหลัก --</option>
+                        </select>
+                    </div>
+                    
+                    
+                    <label class="control-label" for="tech_exholidays">tech_exholidays</label>
+                    <div class="controls">
+                        <div ng-repeat="exholiday in technician.tech_exholidays track by $index">
+                             <input type="datetime-local" data-ng-model="exholiday.start" class="form-control" placeholder="วันที่">                            
+                            <input type="datetime-local" data-ng-model="exholiday.end" class="form-control" placeholder="วันที่">
+
+                        </div>
+                        <button type="button" ng-click="addSkillInputC()">เพิ่ม</button>
+                    </div>
+
+                    <label class="control-label" for="tech_skills">tech_skill</label>
+                    <div class="controls">
+                        <div ng-repeat="tech_skill in technician.tech_skills track by $index">
+                            <select ng-model="tech_skill.skill_id" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
+                              <option value="">-- เลือกความสามารถ --</option>
+                            </select>
+                        </div>
+                        <button type="button" ng-click="addExHolidayInputE()">เพิ่ม</button>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-default">
+                </div>
+				<div data-ng-show="error" class="text-danger">
+					<strong data-ng-bind="error"></strong>
+				</div>
+            </fieldset>
+        </form>
+    </div>
+</section>
