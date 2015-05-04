@@ -10,11 +10,39 @@ var mongoose = require('mongoose'),
  * Sa Schema
  */
 var SaSchema = new Schema({
-	name: {
+	sa_id: {
 		type: String,
 		default: '',
-		required: 'Please fill Sa name',
+		required: 'Please fill SA ID',
+	},
+	sa_nickname: {
+		type: String,
+		required: 'Please fill SA Nickname',
 		trim: true
+	},
+	sa_fullname: {
+		type: String,
+		default: '',
+		required: 'Please fill SA Full Name',
+		trim: true
+	},
+	sa_tel: {
+		type: String,
+		default: '',
+		required: 'Please fill SA Telephone Number',
+		trim: true
+	},
+	sa_signdate: {
+		type: Date,
+		default: Date.now
+	},
+	sa_is_resign: {
+		type: Boolean,
+		default: false
+	},
+	sa_resigndate: {
+		type: Date,
+		default: Date.now
 	},
 	created: {
 		type: Date,

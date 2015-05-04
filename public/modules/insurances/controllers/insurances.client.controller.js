@@ -9,7 +9,8 @@ angular.module('insurances').controller('InsurancesController', ['$scope', '$sta
 		$scope.create = function() {
 			// Create new Insurance object
 			var insurance = new Insurances ({
-				name: this.name
+				insurance_name: this.insurance_name,
+				insurance_tell: this.insurance_tel
 			});
 
 			// Redirect after save
@@ -17,7 +18,8 @@ angular.module('insurances').controller('InsurancesController', ['$scope', '$sta
 				$location.path('insurances/' + response._id);
 
 				// Clear form fields
-				$scope.name = '';
+				$scope.insurance_name = '';
+				%scope.insurance_tel = '';
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});

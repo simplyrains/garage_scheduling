@@ -22,13 +22,28 @@
 - sa_nickname
 - sa_fullname
 - sa_tel
+- sa_is_resign
 - sa_signdate
 - sa_resigndate
 
 ====== Insurance =========
 
 - insurance_name
-- insurance_tell
+- insurance_tel
+
+more:
+- topServHR
+
+
+
+
+
+
+
+
+
+
+
 
 ====== Job =============== / job_detail
 
@@ -46,9 +61,12 @@
 	- arrival		datetime
 }
 
+// ADDITIONAL FIELD
+
+
+
 ====== Car ============== / customer_car
 
-- car 				arr[] of object_ref
 - customer_name		string
 - customer_tel		string
 - model				object_ref

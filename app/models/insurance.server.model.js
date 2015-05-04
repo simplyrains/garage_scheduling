@@ -10,11 +10,14 @@ var mongoose = require('mongoose'),
  * Insurance Schema
  */
 var InsuranceSchema = new Schema({
-	name: {
+	insurance_name: {
 		type: String,
 		default: '',
 		required: 'Please fill Insurance name',
 		trim: true
+	},
+	insurance_tel: {
+		type: String
 	},
 	created: {
 		type: Date,

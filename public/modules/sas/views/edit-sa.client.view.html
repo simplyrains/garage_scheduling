@@ -1,14 +1,47 @@
 <section data-ng-controller="SasController" data-ng-init="findOne()">
     <div class="page-header">
-        <h1>Edit Sa</h1>
+        <h1>Edit SA</h1>
     </div>
     <div class="col-md-12">
         <form class="form-horizontal" data-ng-submit="update()" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
+                    <label class="control-label" for="sa_id">sa_id</label>
                     <div class="controls">
-                        <input type="text" data-ng-model="sa.name" id="name" class="form-control" placeholder="Name" required>
+                        <input type="text" data-ng-model="sa.sa_id" id="sa_id" class="form-control" placeholder="sa_id" required>
+                    </div>
+                    <label class="control-label" for="sa_nickname">sa_nickname</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="sa.sa_nickname" id="sa_nickname" class="form-control" placeholder="sa_nickname" required>
+                    </div>
+
+                    <label class="control-label" for="sa_fullname">sa_fullname</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="sa.sa_fullname" id="sa_fullname" class="form-control" placeholder="sa_fullname" required>
+                    </div>
+
+                    <label class="control-label" for="sa_tel">sa_tell</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="sa.sa_tel" id="sa_tel" class="form-control" placeholder="sa_tel" required>
+                    </div>
+
+                    <label class="control-label" for="sa_signdate">sa_signdate</label>
+                    <div class="controls">
+                        <input type="date" data-ng-model="sa.sa_signdate" id="sa_signdate" class="form-control" placeholder="sa_signdate" required>
+                    </div>
+
+                    <label class="control-label">sa_resigndate</label>
+                    <div class="controls row">
+                        <div class="col-md-3">
+                            <label class="control-label" for="sa_is_resign">ลาออก?</label>
+
+                            <input type="checkbox" data-ng-model="sa.sa_is_resign" id="sa_is_resign" class="form-control">
+                        </div>
+                        <div class="col-md-9">
+                            <label class="control-label" for="sa_resigndate">วันที่ออก</label>
+
+                            <input type="date" data-ng-model="sa.sa_resigndate" id="sa_resigndate" class="form-control" placeholder="sa_resigndate">
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">

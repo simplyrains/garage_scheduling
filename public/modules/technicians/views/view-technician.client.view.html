@@ -1,7 +1,7 @@
 <section data-ng-controller="TechniciansController" data-ng-init="findOne()">
 	<div class="page-header">
 		<h1 data-ng-bind="technician.name"></h1>
-		<p>{{technician.name2}}</p>
+		<p>{{technician.tech_fullname}}</p>
 	</div>
 	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == technician.user._id))">
 		<a class="btn btn-primary" href="/#!/technicians/{{technician._id}}/edit">

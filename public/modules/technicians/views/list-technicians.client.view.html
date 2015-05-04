@@ -3,9 +3,16 @@
         <h1>Technicians</h1>
     </div>
     <div class="list-group">
-        <a data-ng-repeat="technician in technicians" data-ng-href="#!/technicians/{{technician._id}}" class="list-group-item">
-			<h4 class="list-group-item-heading" data-ng-bind="technician.name"></h4>
-        </a>
+        <div data-ng-repeat="technician in technicians" class="list-group-item">
+            <a data-ng-href="#!/technicians/{{technician._id}}">
+                <h4 class="list-group-item-heading" data-ng-bind="technician.tech_fullname"></h4>
+            </a>
+            <a class="btn btn-primary" href="/#!/technicians/{{technician._id}}/edit">
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+
+        </div>
+
     </div>
     <div class="alert alert-warning text-center" data-ng-hide="!technicians.$resolved || technicians.length">
     	No Technicians yet, why don't you <a href="/#!/technicians/create">create one</a>?

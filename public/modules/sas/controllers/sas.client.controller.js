@@ -9,7 +9,13 @@ angular.module('sas').controller('SasController', ['$scope', '$stateParams', '$l
 		$scope.create = function() {
 			// Create new Sa object
 			var sa = new Sas ({
-				name: this.name
+				sa_id: this.sa_id,
+				sa_nickname: this.sa_nickname,
+				sa_fullname: this.sa_fullname,
+				sa_signdate: this.sa_signdate,
+				sa_is_resign: this.sa_is_resign,
+				sa_resigndate: this.sa_resigndate,
+				sa_tel: this.sa_tel
 			});
 
 			// Redirect after save
@@ -18,6 +24,13 @@ angular.module('sas').controller('SasController', ['$scope', '$stateParams', '$l
 
 				// Clear form fields
 				$scope.name = '';
+				$scope.sa_id = '';
+				$scope.sa_nickname = '';
+				$scope.sa_fullname = '';
+				$scope.sa_signdate = '';
+				$scope.sa_is_resign = false;
+				$scope.sa_resigndate = '';
+				$scope.sa_tel = ''; 
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
