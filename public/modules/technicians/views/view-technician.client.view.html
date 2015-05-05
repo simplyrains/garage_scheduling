@@ -3,7 +3,7 @@
 		<h1 data-ng-bind="technician.name"></h1>
 		<p>{{technician.tech_fullname}}</p>
 	</div>
-	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == technician.user._id))">
+	<div class="pull-right" data-ng-show="((authentication.user))">
 		<a class="btn btn-primary" href="/#!/technicians/{{technician._id}}/edit">
 			<i class="glyphicon glyphicon-edit"></i>
 		</a>

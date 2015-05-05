@@ -10,6 +10,7 @@ angular.module('insurances').controller('InsurancesController', ['$scope', '$sta
 			// Create new Insurance object
 			var insurance = new Insurances ({
 				insurance_name: this.insurance_name,
+				insurance_displayname: this.insurance_displayname,
 				insurance_tell: this.insurance_tel
 			});
 
@@ -19,7 +20,8 @@ angular.module('insurances').controller('InsurancesController', ['$scope', '$sta
 
 				// Clear form fields
 				$scope.insurance_name = '';
-				%scope.insurance_tel = '';
+				$scope.insurance_tel = '';
+				$scope.insurance_displayname = '';
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});

@@ -6,11 +6,16 @@
         <form class="form-horizontal" data-ng-submit="update()" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <label class="control-label" for="insurance_name">Name</label>
+                    <label class="control-label" for="insurance_name">ID</label>
                     <div class="controls">
                         <input type="text" data-ng-model="insurance.insurance_name" id="insurance_name" class="form-control" placeholder="insurance_name" required>
                     </div>
-                    <label class="control-label" for="name">Tel</label>
+                    <label class="control-label" for="insurance_displayname">Name</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="insurance.insurance_displayname" id="insurance_displayname" class="form-control" placeholder="insurance_displayname" required>
+                    </div>
+                    <label class="control-label" for="insurance_tel">Tel</label>
+
                     <div class="controls">
                         <input type="text" data-ng-model="insurance.insurance_tel" id="insurance_tel" class="form-control" placeholder="insurance_tel" required>
                     </div>

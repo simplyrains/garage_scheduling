@@ -4,8 +4,9 @@
     </div>
     <div class="list-group">
         <a data-ng-repeat="job in jobs" data-ng-href="#!/jobs/{{job._id}}" class="list-group-item">
+            {{job.bpj_no}}
 			<small class="list-group-item-text">
-				Posted on
+			     <br />Posted on
 				<span data-ng-bind="job.created | date:'medium'"></span>
 				by
 				<span data-ng-bind="job.user.displayName"></span>

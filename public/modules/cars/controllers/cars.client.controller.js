@@ -1,23 +1,38 @@
 'use strict';
 
 // Cars controller
-angular.module('cars').controller('CarsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Cars',
-	function($scope, $stateParams, $location, Authentication, Cars) {
+angular.module('cars').controller('CarsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Cars', 'Insurances',
+	function($scope, $stateParams, $location, Authentication, Cars, Insurances) {
 		$scope.authentication = Authentication;
+
+		$scope.insurances = Insurances.query();
 
 		// Create new Car
 		$scope.create = function() {
 			// Create new Car object
 			var car = new Cars ({
-				name: this.name
+				name: this.name,
+				customer_name: this.customer_name,
+				customer_tel: this.customer_tel,
+				insurance: this.insurance,
+				name_plate: this.name_plate,
+				model_id: this.model_id,
+				colour_id: this.colour_id
 			});
 
 			// Redirect after save
 			car.$save(function(response) {
-				$location.path('cars/' + response._id);
+				$location.path('cars');
 
 				// Clear form fields
 				$scope.name = '';
+				$scope.customer_name = '';				
+				$scope.customer_tel = '';					
+				$scope.insurance = '';				
+				$scope.name_plate = '';				
+				$scope.model_id = '';			
+				$scope.colour_id = '';
+
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});

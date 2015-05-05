@@ -6,10 +6,53 @@
         <form class="form-horizontal" data-ng-submit="create()" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
+                    <label class="control-label" for="bpj_no">bpj_no</label>
                     <div class="controls">
-                        <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
+                        <select ng-model="bpj_no" ng-options="job.bpj_no as job.bpj_no for job in jobs">
+                          <option value="">-- เลือกจ้อบ --</option>
+                        </select>
                     </div>
+
+                    <label class="control-label" for="tech_id">tech_id</label>
+                    <div class="controls">
+                        <select ng-model="tech_id" ng-options="technician.tech_fullname as technician.tech_fullname for technician in technicians">
+                          <option value="">-- เลือกช่าง --</option>
+                        </select>
+                    </div>
+                    <label class="control-label" for="start_time">start_time</label>
+                    <div class="controls">
+                        <input type="date" data-ng-model="start_time" id="start_time" class="form-control" placeholder="start_time">
+                    </div>
+
+                    <label class="control-label" for="duration">duration</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="duration" id="duration" class="form-control" placeholder="duration">
+                    </div>
+
+                    <label class="control-label" for="note">note</label>
+                    <div class="controls">
+                        <input type="textarea" data-ng-model="note" id="note" class="form-control" placeholder="note">
+                    </div>
+
+                    <label class="control-label" for="locked">locked</label>
+                    <div class="controls">
+                        <input type="checkbox" data-ng-model="locked" id="locked" class="form-control">
+                    </div>
+
+                    <label class="control-label" for="station">station</label>
+                    <div class="controls">
+                        <select ng-model="tech_main_station" ng-options="factory.id as factory.name for factory in factoryChoice">
+                          <option value="">-- เลือกสถานีหลัก --</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label" for="skill_requirements">skill_requirements</label>
+                    <div class="controls">
+                        <select ng-model="skill_requirements" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
+                            <option value="">-- เลือกความสามารถ --</option>
+                        </select>                   
+                    </div>
+
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-default">

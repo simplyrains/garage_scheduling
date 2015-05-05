@@ -10,19 +10,35 @@ var mongoose = require('mongoose'),
  * Task Schema
  */
 var TaskSchema = new Schema({
-	name: {
-		type: String,
-		default: '',
-		required: 'Please fill Task name',
-		trim: true
+	//bpj_no = job_id
+	bpj_no: {
+		type: String
+	},
+	station: {
+		type: Number
+	},
+	tech_id: {
+		type: String
+	},
+	start_time: {
+		type: Date
+	},
+	duration: {
+		type: Number
+	},
+	note: {
+		type: String
+	},
+	locked: {
+		type: Boolean,
+		default: false
+	},
+	skill_requirements: {
+		type: String
 	},
 	created: {
 		type: Date,
 		default: Date.now
-	},
-	user: {
-		type: Schema.ObjectId,
-		ref: 'User'
 	}
 });
 

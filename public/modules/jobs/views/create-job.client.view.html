@@ -5,12 +5,121 @@
     <div class="col-md-12">
         <form class="form-horizontal" data-ng-submit="create()" novalidate>
             <fieldset>
-                <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
+
+                    <label class="control-label" for="bpj_no">bpj_no</label>
                     <div class="controls">
-                        <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
+                        <input type="text" data-ng-model="bpj_no" id="bpj_no" class="form-control" placeholder="bpj_no" required>
                     </div>
-                </div>
+
+                    <label class="control-label" for="bpe_no">bpe_no</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="bpe_no" id="bpe_no" class="form-control" placeholder="bpe_no" required>
+                    </div>
+
+                    <label class="control-label" for="start_dt">start_dt</label>
+                    <div class="controls">
+                        <input type="date" data-ng-model="start_dt" id="start_dt" class="form-control" placeholder="start_dt" required>
+                    </div>
+
+                    <label class="control-label" for="retrieve_dt">retrieve_dt</label>
+                    <div class="controls">
+                        <input type="date" data-ng-model="retrieve_dt" id="retrieve_dt" class="form-control" placeholder="retrieve_dt" required>
+                    </div>
+
+                    <label class="control-label" for="sa_id">sa_id</label>
+                    <div class="controls">
+                        <select ng-model="sa_id" ng-options="sa.sa_nickname as sa.sa_nickname for sa in sas">
+                          <option value="">-- เลือกทะเบียนรถ --</option>
+                        </select>                    </div>
+
+                    <label class="control-label" for="name_plate">name_plate</label>
+                    <div class="controls">
+                        <select ng-model="name_plate" ng-options="car.name_plate as car.name_plate for car in cars">
+                          <option value="">-- เลือกทะเบียนรถ --</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label" for="car_type">car_type</label>
+                    <div class="controls">
+                        <select ng-model="car_type" ng-options="c as c for c in carTypeChoice">
+                            <option value="">-- เลือก --</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label" for="work_type">work_type</label>
+                    <div class="controls">
+                        <select ng-model="work_type" ng-options="w as w for w in workTypeChoice">
+                            <option value="">-- เลือก --</option>
+                        </select>
+                    </div>
+
+                    <label class="control-label" for="topserv_hr">topserv_hr</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
+                    </div>
+
+
+                    <label class="control-label" for="backorder_parts">backorder_part</label>
+                    <button type="button" ng-click="addBackOrderPartInputC()">เพิ่ม</button>
+
+                    <div class="controls row">
+                        <div class="col-md-3" ng-repeat="backorder_part in backorder_parts track by $index">
+
+
+                            <label class="control-label" for="backorder_part.name">รายละเอียด</label>
+                            <input type="text" data-ng-model="backorder_part.name" class="form-control" placeholder="รายละเอียด">               
+
+                            <label class="control-label" for="backorder_part.station">สถานี</label>
+                            <select ng-model="backorder_part.station" ng-options="factory.id as factory.name for factory in factoryChoice">
+                              <option value="">-- เลือกสถานีที่ใช้ --</option>
+                            </select>
+
+                            <label class="control-label" for="backorder_part.arrival">วันที่ได้รับ</label>
+                            <input type="date" data-ng-model="backorder_part.arrival" class="form-control" placeholder="วันที่">
+                            <br /> <br />
+                        </div>
+
+                    </div>
+
+
+                    <label class="control-label" for="tel_info">tel_info</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="tel_info" id="tel_info" class="form-control" placeholder="tel_info" required>
+                    </div>
+
+
+                    <label class="control-label" for="tel_details">tel_detail</label>
+                    <button type="button" ng-click="addTelDetailInputC()">เพิ่ม</button>
+
+                    <div class="controls row">
+                        <div class="col-md-3" ng-repeat="tel_detail in tel_details track by $index">
+                            <label class="control-label" for="tel_detail.tel_time">วันที่</label>
+                            <input type="datetime-local" data-ng-model="tel_detail.tel_time" class="form-control">
+
+                            <label class="control-label" for="tel_detail.tel_desc">รายละเอียด</label>
+                            <input type="text" data-ng-model="tel_detail.tel_desc" class="form-control" placeholder="รายละเอียด">   
+                             <br /> <br />
+            
+                        </div>
+
+                    </div>
+
+
+
+                    <label class="control-label" for="tel_details">เวลาประเมินจากหัวหน้าช่าง</label>
+
+                    <div class="controls row">
+                        <div class="col-md-1" ng-repeat="approx_hr in approx_hrs track by $index">
+                            <label class="control-label">{{factoryChoice[approx_hr.station-1].name}}</label>
+                            <input type="text" data-ng-model="approx_hr.time" class="form-control" placeholder="ชั่วโมง">               
+                        </div>
+
+                    </div>
+
+
+
+
+
                 <div class="form-group">
                     <input type="submit" class="btn btn-default">
                 </div>

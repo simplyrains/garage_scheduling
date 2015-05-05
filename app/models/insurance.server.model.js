@@ -13,7 +13,13 @@ var InsuranceSchema = new Schema({
 	insurance_name: {
 		type: String,
 		default: '',
-		required: 'Please fill Insurance name',
+		required: 'Please fill Insurance ID',
+		trim: true
+	},
+	insurance_displayname: {
+		type: String,
+		default: '',
+		required: 'Please fill Insurance insurance_displayname',
 		trim: true
 	},
 	insurance_tel: {

@@ -2,7 +2,7 @@
 	<div class="page-header">
 		<h1 data-ng-bind="car.name"></h1>
 	</div>
-	<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == car.user._id))">
+	<div class="pull-right" data-ng-show="((authentication.user))">
 		<a class="btn btn-primary" href="/#!/cars/{{car._id}}/edit">
 			<i class="glyphicon glyphicon-edit"></i>
 		</a>
@@ -12,10 +12,7 @@
 	</div>
 	<small>
 		<em class="text-muted">
-			Posted on
-			<span data-ng-bind="car.created | date:'mediumDate'"></span>
-			by
-			<span data-ng-bind="car.user.displayName"></span>
+
 		</em>
 	</small>
 </section>

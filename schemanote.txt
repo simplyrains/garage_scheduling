@@ -7,13 +7,13 @@
 - tech_holiday
 - tech_exholidays{
 		- date
-		- duration (date)
+		- duration
 }
-- tech_main_station
+- tech_main_station		number
 - tech_skills{
 		- skill
-		- station (note: can be ref form skill) TODO
-		- level
+		^ station (note: can be ref form skill) TODO
+		^ level
 } *ref - work
 
 ====== SA =============== / SA
@@ -29,6 +29,7 @@
 ====== Insurance =========
 
 - insurance_name
+- insurance_displayname
 - insurance_tel
 
 more:
@@ -44,59 +45,65 @@ more:
 
 
 
+====== Car ============== / customer_car
+
+- customer_name		string
+- customer_tel		string
+- insurance 		string
+- name_plate		string
+- model_id			string
+- colour_id			string
 
 ====== Job =============== / job_detail
 
 - bpj_no 			string
 - bpe_no			string
 - start_dt			date
-- sa_id				object_ref SA
-- car_id			object_ref Car
+- retrieve_dt		date
+- sa_id				string > KEY
+- name_plate		string > KEY
 - car_type			enum
 - work_type			enum
 - topserv_hr		number
-- backorder_part{
+- backorder_parts{
 	- name 			string
-	- station 		string
+	- station 		number
 	- arrival		datetime
 }
-
+- tel_details{
+	- tel_time		date
+	- tel_desc		string
+} *ref tell_history
+- tel_info			strinf
+- approx_hrs{
+	- station 		number
+	- time 			number
+}
 // ADDITIONAL FIELD
 
 
-
-====== Car ============== / customer_car
-
-- customer_name		string
-- customer_tel		string
-- model				object_ref
-- insurance 		object_ref
-- name_plate		string
-- model_id			string
-- colour_id			string
-- tell_history{
-	- bpj_no		string
-	- tell_time		date
-	- tell_desc		string
-} *ref tell_history
-
 ====== Task =============
 
-- tech_ref			object_red Technician
+- bpj_no = job_id			string
+- tech_id			string
 - start_time		date
-- duration			date(number?)
+- duration			number
 - note				string
 - locked			boolean
-
->>>>>>>>>> IGNORED
-
-- car_model -> ENUM
-- car_colour -> universal toyota color
-
+- station 			number
+- skill_requirements -> skill_id (FACTORY-SKILL.LEVEL)
 
 >>>>>>>>>> LATER
 - ot
 - extra_holiday
+- รายละเอียด (ติดกระจก, etc)
 - งานซ่อมเพิ่มเติม
 - งานตีกลับภายนอก
-- 
+- car_model -> 
+- car_colour -> universal toyota color
+- แก้ skill_requirement ใน job เป็น array
+
+
+// NOTE:
+how to fix date display problem: http://plnkr.co/edit/QFrHJMm9p14EgGpTDr13?p=preview
+http://stackoverflow.com/questions/12419619/whats-the-difference-between-ng-model-and-ng-bind
