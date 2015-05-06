@@ -16,13 +16,13 @@ angular.module('technicians').controller('TechniciansController', ['$scope', '$s
 		];
 
 		$scope.holidayChoice = [
-			{id: 0, name: 'จันทร์'},
-			{id: 1, name: 'อังคาร'},
-			{id: 2, name: 'พุธ'},
-			{id: 3, name: 'พฤหัส'},
-			{id: 4, name: 'ศุกร์'},
-			{id: 5, name: 'เสาร์'},
-			{id: 6, name: 'อาทิตย์'}
+			{id: 0, name: 'อาทิตย์'},
+			{id: 1, name: 'จันทร์'},
+			{id: 2, name: 'อังคาร'},
+			{id: 3, name: 'พุธ'},
+			{id: 4, name: 'พฤหัส'},
+			{id: 5, name: 'ศุกร์'},
+			{id: 6, name: 'เสาร์'}
 		];
 
 		$scope.skillChoice = [
