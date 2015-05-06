@@ -14,7 +14,8 @@ var JobSchema = new Schema({
 		type: String,
 		default: '',
 		required: 'Please fill Job name',
-		trim: true
+		trim: true,
+		unique: true
 	},
 	bpe_no: {
 		type: String,

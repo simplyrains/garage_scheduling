@@ -13,7 +13,8 @@ var TechnicianSchema = new Schema({
 	tech_id: {
 		type: String,
 		required: 'Please fill Technician ID',
-		trim: true
+		trim: true,
+		unique: true
 	},
 	tech_fullname: {
 		type: String,

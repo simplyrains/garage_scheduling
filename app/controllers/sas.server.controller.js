@@ -100,8 +100,8 @@ exports.saByID = function(req, res, next, id) {
  * Sa authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-	if (req.sa.user.id !== req.user.id) {
-		return res.status(403).send('User is not authorized');
-	}
+	// if (req.sa.user.id !== req.user.id) {
+	// 	return res.status(403).send('User is not authorized');
+	// }
 	next();
 };

@@ -100,8 +100,8 @@ exports.carByID = function(req, res, next, id) {
  * Car authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-	if (req.car.user.id !== req.user.id) {
-		return res.status(403).send('User is not authorized');
-	}
+	// if (req.car.user.id !== req.user.id) {
+	// 	return res.status(403).send('User is not authorized');
+	// }
 	next();
 };

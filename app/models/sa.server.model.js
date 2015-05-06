@@ -14,6 +14,7 @@ var SaSchema = new Schema({
 		type: String,
 		default: '',
 		required: 'Please fill SA ID',
+		unique: true
 	},
 	sa_nickname: {
 		type: String,

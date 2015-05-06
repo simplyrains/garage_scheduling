@@ -14,7 +14,8 @@ var InsuranceSchema = new Schema({
 		type: String,
 		default: '',
 		required: 'Please fill Insurance ID',
-		trim: true
+		trim: true,
+		unique: true
 	},
 	insurance_displayname: {
 		type: String,

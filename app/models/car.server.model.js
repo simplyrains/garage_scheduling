@@ -28,7 +28,8 @@ var CarSchema = new Schema({
 	name_plate: {
 		type: String,
 		required: 'Please fill name_plate',
-		trim: true
+		trim: true,
+		unique: true
 	},
 	model_id: {
 		type: String,
