@@ -70,7 +70,7 @@ more:
 	- station 		number
 	- arrival		datetime
 }
-- tel_details{
+- tel_details{   
 	- tel_time		date
 	- tel_desc		string
 } *ref tell_history
@@ -84,10 +84,11 @@ more:
 
 ====== Task =============
 
-- bpj_no = job_id			string
+- bpj_no = job_id	string
 - tech_id			string
-- start_time		date
-- duration			number
+- date				date
+- start_slot		number
+- duration			number (slot) ,30min = 1 slot
 - note				string
 - locked			boolean
 - station 			number
