@@ -1,7 +1,52 @@
 <section data-ng-controller="TasksController" data-ng-init="find()">
     <div class="page-header">
-        <h1>Tasks</h1>
+        <h1>Tasks {{status}} / {{status2}}</h1>
     </div>
+    <div class="row">
+        <table class="table table-bordered table-condensed">
+            <thead>
+                <tr>
+                    <th style="width: 20px" rowspan="2">
+                        #
+                    </th>
+                    <th style="width: 50px" rowspan="2">
+                        Date
+                    </th>
+                    <th style="width: 150px" rowspan="2">
+                        Time
+                    </th>
+                    <th ng-repeat="technician in technicians" style="font-size: xx-small; width: 150px;">
+                        {{technician.tech_id}} <br /xz>{{technician.tech_main_station}} / {{factoryChoice[technician.tech_main_station-1].name}}
+                    </th>
+                </tr>
+                <tr>
+                    <th ng-repeat="technician in technicians" style="font-size: xx-small; width: 100px; overflow: hidden; white-space: nowrap;">
+                        {{technician.tech_fullname}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in table" ng-class="slot-{{$index%16}}">
+                    <td>
+                        {{$index}}
+                    </td>
+                    <td style="font-size: small;">
+                        {{calc_date($index) | date:'dd/MM'}}
+                    </td>
+                    <td style="font-size: xx-small; white-space: nowrap;">
+                        {{slot[$index%16].time}}
+                    </td>
+                    <td ng-repeat="cell in row track by $index" ng-class="cell.is_holiday ? 'danger' : '' ">
+                        <a ng-if="display_cell(cell)" class="btn btn-primary" href="/#!/tasks/{{cell.task._id}}/edit">
+                            {{cell.task.job.name_plate}}
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    
     <div class="list-group">
         <a data-ng-repeat="task in tasks" data-ng-href="#!/tasks/{{task._id}}" class="list-group-item">
 			<small class="list-group-item-text">
