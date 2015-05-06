@@ -11,20 +11,23 @@ var mongoose = require('mongoose'),
  */
 var TaskSchema = new Schema({
 	//bpj_no = job_id
-	bpj_no: {
-		type: String
+	job: {
+		type: Schema.ObjectId,
+		ref: 'Job'
 	},
-	station: {
-		type: Number
+	technician: {
+		type: Schema.ObjectId,
+		ref: 'Technician'
 	},
-	tech_id: {
-		type: String
-	},
-	start_time: {
+	date: {
 		type: Date
 	},
-	duration: {
+	start_slot: {
 		type: Number
+	},
+	duration: {
+		type: Number,
+		required: 'Please fill duration'
 	},
 	note: {
 		type: String
@@ -34,7 +37,12 @@ var TaskSchema = new Schema({
 		default: false
 	},
 	skill_requirements: {
-		type: String
+		type: String,
+		required: 'Please fill skill_requirements'
+	},
+	station: {
+		type: Number,
+		required: 'Please fill station'
 	},
 	created: {
 		type: Date,
