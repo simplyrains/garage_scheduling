@@ -73,7 +73,7 @@ exports.delete = function(req, res) {
  * List of Tasks
  */
 exports.list = function(req, res) { 
-	Task.find().sort('-created').populate('user', 'displayName').exec(function(err, tasks) {
+	Task.find().sort('-created').populate('job', 'name_plate bpj_no').populate('technician', 'tech_id tech_fullname tech_skills').exec(function(err, tasks) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
@@ -88,7 +88,7 @@ exports.list = function(req, res) {
  * Task middleware
  */
 exports.taskByID = function(req, res, next, id) { 
-	Task.findById(id).populate('user', 'displayName').exec(function(err, task) {
+	Task.findById(id).populate('job', 'name_plate bpj_no').populate('technician', 'tech_id tech_fullname tech_skills').exec(function(err, task) {
 		if (err) return next(err);
 		if (! task) return next(new Error('Failed to load Task ' + id));
 		req.task = task ;
@@ -100,8 +100,8 @@ exports.taskByID = function(req, res, next, id) {
  * Task authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-	if (req.task.user.id !== req.user.id) {
-		return res.status(403).send('User is not authorized');
-	}
+	// if (req.task.user.id !== req.user.id) {
+	// 	return res.status(403).send('User is not authorized');
+	// }
 	next();
 };
