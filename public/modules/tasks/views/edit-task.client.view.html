@@ -8,23 +8,29 @@
                 <div class="form-group">
 
                     <label class="control-label" for="bpj_no">bpj_no</label>
-                    <div class="controls">
-                        <select ng-model="task.bpj_no" ng-options="job.bpj_no as job.bpj_no for job in jobs">
-                          <option value="">-- เลือกจ้อบ --</option>
-                        </select>
+                    <div class="controls">                        
+                        <input type="text" data-ng-model="task.job.bpj_no" id="text" class="form-control" readonly>
                     </div>
 
-                    <label class="control-label" for="tech_id">tech_id</label>
+                    <label class="control-label" for="technician">technician (เดิม: {{task.technician.tech_fullname}})</label>
                     <div class="controls">
-                        <select ng-model="task.tech_id" ng-options="technician.tech_fullname as technician.tech_fullname for technician in technicians">
+                        <select ng-model="task.technician" ng-options="t._id as t.tech_fullname for t in technicians">
                           <option value="">-- เลือกช่าง --</option>
                         </select>
                     </div>
-                    <label class="control-label" for="start_time">start_time</label>
+
+                    <label class="control-label" for="date">date</label>
                     <div class="controls">
-                        <input type="date" data-ng-model="task.start_time" id="start_time" class="form-control" placeholder="start_time">
+                        <input type="text" data-ng-model="task.date" id="date" class="form-control" placeholder="date">
                     </div>
 
+
+                    <label class="control-label" for="start_slot">start_slot</label>
+                    <div class="controls">
+                        <select ng-model="task.start_slot" ng-options="s.id as s.time for s in slot">
+                          <option value="">-- เลือกเวลา --</option>
+                        </select>                    
+                    </div>
                     <label class="control-label" for="duration">duration</label>
                     <div class="controls">
                         <input type="text" data-ng-model="task.duration" id="duration" class="form-control" placeholder="duration">
@@ -52,7 +58,8 @@
                         <select ng-model="task.skill_requirements" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
                             <option value="">-- เลือกความสามารถ --</option>
                         </select>                   
-                    </div>                </div>
+                    </div>       
+                </div>
                 <div class="form-group">
                     <input type="submit" value="Update" class="btn btn-default">
                 </div>

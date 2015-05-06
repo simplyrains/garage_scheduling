@@ -8,20 +8,28 @@
                 <div class="form-group">
                     <label class="control-label" for="bpj_no">bpj_no</label>
                     <div class="controls">
-                        <select ng-model="bpj_no" ng-options="job.bpj_no as job.bpj_no for job in jobs">
+                        <select ng-model="job" ng-options="job._id as job.bpj_no for job in jobs">
                           <option value="">-- เลือกจ้อบ --</option>
                         </select>
                     </div>
 
-                    <label class="control-label" for="tech_id">tech_id</label>
+                    <label class="control-label" for="technician">technician</label>
                     <div class="controls">
-                        <select ng-model="tech_id" ng-options="technician.tech_fullname as technician.tech_fullname for technician in technicians">
+                        <select ng-model="technician" ng-options="t._id as t.tech_fullname for t in technicians">
                           <option value="">-- เลือกช่าง --</option>
                         </select>
                     </div>
-                    <label class="control-label" for="start_time">start_time</label>
+
+                    <label class="control-label" for="date">date</label>
                     <div class="controls">
-                        <input type="date" data-ng-model="start_time" id="start_time" class="form-control" placeholder="start_time">
+                        <input type="date" data-ng-model="date" id="date" class="form-control" placeholder="date">
+                    </div>
+
+                    <label class="control-label" for="start_slot">start_slot</label>
+                    <div class="controls">
+                        <select ng-model="start_slot" ng-options="s.id as s.time for s in slot">
+                          <option value="">-- เลือกเวลา --</option>
+                        </select>                    
                     </div>
 
                     <label class="control-label" for="duration">duration</label>
@@ -41,7 +49,7 @@
 
                     <label class="control-label" for="station">station</label>
                     <div class="controls">
-                        <select ng-model="tech_main_station" ng-options="factory.id as factory.name for factory in factoryChoice">
+                        <select ng-model="station" ng-options="factory.id as factory.name for factory in factoryChoice">
                           <option value="">-- เลือกสถานีหลัก --</option>
                         </select>
                     </div>
