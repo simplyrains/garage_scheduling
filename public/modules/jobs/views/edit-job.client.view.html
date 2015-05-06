@@ -19,12 +19,12 @@
 
                     <label class="control-label" for="start_dt">วันที่นำรถมาจอด start_dt {{ job.start_dt | date: 'dd-MM-yyyy' }}</label>
                     <div class="controls">
-                        <input type="date" data-ng-model="job.start_dt" id="start_dt" class="form-control" value="{{ job.start_dt | date: 'dd-MM-yyyy' }}" placeholder="start_dt" required>
+                        <input type="text" data-ng-model="job.start_dt" id="start_dt" class="form-control" value="{{ job.start_dt | date: 'dd-MM-yyyy' }}" placeholder="start_dt" required>
                     </div>
 
                     <label class="control-label" for="retrieve_dt">วันรับรถ retrieve_dt {{ job.retrieve_dt | date: 'dd-MM-yyyy' }}</label>
                     <div class="controls">
-                        <input type="date" data-ng-model="job.retrieve_dt" id="retrieve_dt" class="form-control" value="{{ job.retrieve_dt | date: 'dd-MM-yyyy' }}" placeholder="retrieve_dt" required>
+                        <input type="text" data-ng-model="job.retrieve_dt" id="retrieve_dt" class="form-control" value="{{ job.retrieve_dt | date: 'dd-MM-yyyy' }}" placeholder="retrieve_dt" required>
                     </div>
 
                     <label class="control-label" for="sa_id">sa_id</label>
@@ -42,17 +42,15 @@
                         <input type="text" data-ng-model="job.car_type" id="car_type" class="form-control" placeholder="car_type" required>
                     </div>
 
-
-                    <label class="control-label" for="work_type">work_type</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="job.work_type" id="work_type" class="form-control" placeholder="work_type" required>
-                    </div>
-
                     <label class="control-label" for="topserv_hr">topserv_hr</label>
                     <div class="controls">
                         <input type="text" data-ng-model="job.topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
                     </div>
 
+
+                    <label class="control-label" for="work_type">work_type -> {{workTypeChoice[calculate_level(job.topserv_hr)].name}}</label>
+                    <br />
+                    <br />
 
                     <label class="control-label" for="backorder_parts">backorder_part</label>
                     <button type="button" ng-click="addBackOrderPartInputE()">เพิ่ม</button>
@@ -70,7 +68,7 @@
                             </select>
 
                             <label class="control-label" for="backorder_part.arrival">วันที่ได้รับ</label>
-                            <input type="date" data-ng-model="backorder_part.arrival" class="form-control" placeholder="วันที่">
+                            <input type="text" data-ng-model="backorder_part.arrival" class="form-control" placeholder="วันที่">
                             <br /> <br />
                         </div>
 
@@ -89,10 +87,10 @@
                     <div class="controls row">
                         <div class="col-md-3" ng-repeat="tel_detail in job.tel_details track by $index">
                             <label class="control-label" for="tel_detail.tel_time">วันที่</label>
-                            <input type="date" data-ng-model="tel_detail.tel_time" class="form-control">
+                            <input type="text" data-ng-model="tel_detail.tel_time" class="form-control">
 
                             <label class="control-label" for="tel_detail.tel_time">เวลา</label>
-                            <input type="datetime-local" data-ng-model="tel_detail.tel_time" class="form-control">
+                            <input type="texttime-local" data-ng-model="tel_detail.tel_time" class="form-control">
 
                             <label class="control-label" for="tel_detail.tel_desc">รายละเอียด</label>
                             <input type="text" data-ng-model="tel_detail.tel_desc" class="form-control" placeholder="รายละเอียด">   
@@ -116,7 +114,7 @@
 
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Update" class="btn btn-default">
+                    <input type="submit" value="Update" class="btn btn-default" ng-class="job.is_in_plan ? 'disabled' : '' ">
                 </div>
 				<div data-ng-show="error" class="text-danger">
 					<strong data-ng-bind="error"></strong>

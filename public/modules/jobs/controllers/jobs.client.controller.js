@@ -8,8 +8,15 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 		$scope.sas = Sas.query();
 		$scope.cars = Cars.query();
 		$scope.carTypeChoice = ['ทั่วไป', 'มีรายการซ่อมเพิ่มเติม', 'งานตีกลับภายนอก', 'เอาออกจากแผนชั่วคราว', 'รถไม่จอด', 'ถอดชิ้นส่วนทิ้งไว้'];
-		$scope.workTypeChoice = ['L','M','H'];
-
+		$scope.workTypeChoice = [
+			{id: 0, name: 'L1'},
+			{id: 1, name: 'L2'},
+			{id: 2, name: 'L3'},
+			{id: 3, name: 'M1'},
+			{id: 4, name: 'M2'},
+			{id: 5, name: 'M3'},
+			{id: 6, name: 'H1~H3'}
+		];
 		$scope.approx_hrs = [];
 		for(var i=1; i<=7; i++) $scope.approx_hrs.push({
 			station: i,
@@ -69,7 +76,7 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				sa_id: this.sa_id,
 				name_plate: this.name_plate,
 				car_type: this.car_type,
-				work_type: this.work_type,
+				work_level: $scope.calculate_level(this.topserv_hr),
 				topserv_hr: this.topserv_hr,
 				backorder_parts: this.backorder_parts,
 				tel_details: this.tel_details,
@@ -90,7 +97,6 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				$scope.sa_id = '';          // this.sa_id,
 				$scope.name_plate = '';          // this.name_plate,
 				$scope.car_type = '';          // this.car_type,
-				$scope.work_type = '';          // this.work_type,
 				$scope.topserv_hr = '';          // this.topserv_hr,
 				$scope.backorder_parts = [];          // this.backorder_parts,
 				$scope.tel_details = [];          // this.tel_details,
@@ -122,9 +128,10 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 		// Update existing Job
 		$scope.update = function() {
 			var job = $scope.job;
+			job.work_level = $scope.calculate_level(job.topserv_hr);
 
 			job.$update(function() {
-				$location.path('jobs/' + job._id);
+				$location.path('tasks');
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -140,6 +147,24 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 			$scope.job = Jobs.get({ 
 				jobId: $stateParams.jobId
 			});
+		};
+
+		// 0 - L1
+		// L2
+		// L3
+		// M1
+		// M2
+		// M3
+		// 6 - H (H1~H3)
+
+		$scope.calculate_level = function(tshr){
+			if(tshr<=20) return 0;
+			if(tshr<=30) return 1;
+			if(tshr<=40) return 2;
+			if(tshr<=55) return 3;
+			if(tshr<=75) return 4;
+			if(tshr<=95) return 5;
+			else return 6;
 		};
 	}
 ]);

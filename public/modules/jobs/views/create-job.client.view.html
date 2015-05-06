@@ -46,18 +46,14 @@
                         </select>
                     </div>
 
-                    <label class="control-label" for="work_type">work_type</label>
-                    <div class="controls">
-                        <select ng-model="work_type" ng-options="w as w for w in workTypeChoice">
-                            <option value="">-- เลือก --</option>
-                        </select>
-                    </div>
-
                     <label class="control-label" for="topserv_hr">topserv_hr</label>
                     <div class="controls">
                         <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
                     </div>
 
+                    <label class="control-label" for="work_type">work_type -> {{workTypeChoice[calculate_level(topserv_hr)].name}}</label>
+                    <br />
+                    <br />
 
                     <label class="control-label" for="backorder_parts">backorder_part</label>
                     <button type="button" ng-click="addBackOrderPartInputC()">เพิ่ม</button>

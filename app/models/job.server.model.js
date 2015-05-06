@@ -24,14 +24,11 @@ var JobSchema = new Schema({
 	},
 	start_dt: {
 		type: Date,
-		default: '',
+		default: Date.now,
 		required: 'Please fill start_dt',
 	},
 	retrieve_dt: {
-		type: Date,
-		default: '',
-		required: 'Please fill retrieve_dt',
-
+		type: Date
 	},
 	sa_id: {
 		type: String,
@@ -46,12 +43,11 @@ var JobSchema = new Schema({
         type: String,
         enum: ['ทั่วไป', 'มีรายการซ่อมเพิ่มเติม', 'งานตีกลับภายนอก', 'เอาออกจากแผนชั่วคราว', 'รถไม่จอด', 'ถอดชิ้นส่วนทิ้งไว้']
 	},
-	work_type: {
-        type: String,
-        enum: ['L','M','H']
+	work_level: {
+        type: Number
 	},
 	topserv_hr: {
-        type: Number,
+        type: Number
 	},
 	backorder_parts: [
 			{
@@ -69,6 +65,16 @@ var JobSchema = new Schema({
 	tel_info: {
 		type: String
 	},
+	is_in_plan: {
+		type: Boolean,
+		default: false
+	},
+	tasks: [
+		{
+			type: Schema.ObjectId,
+			ref: 'Task'
+		}
+	],
 	approx_hrs: [
 			{
 				station: Number,

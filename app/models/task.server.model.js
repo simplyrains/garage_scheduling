@@ -36,9 +36,8 @@ var TaskSchema = new Schema({
 		type: Boolean,
 		default: false
 	},
-	skill_requirements: {
-		type: String,
-		required: 'Please fill skill_requirements'
+	skill_level: {
+		type: Number,
 	},
 	station: {
 		type: Number,

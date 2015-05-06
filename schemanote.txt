@@ -15,6 +15,10 @@
 		^ station (note: can be ref form skill) TODO
 		^ level
 } *ref - work
+Function:
+- check_slot(earliest_time, duration)
+	return the time slot (start_slot, end_slot) that
+	this technician is available for this work
 
 ====== SA =============== / SA
 
@@ -63,7 +67,7 @@ more:
 - sa_id				string > KEY
 - name_plate		string > KEY
 - car_type			enum
-- work_type			enum
+- work_level		number
 - topserv_hr		number
 - backorder_parts{
 	- name 			string
@@ -79,20 +83,28 @@ more:
 	- station 		number
 	- time 			number
 }
+- is_in_plan		boolean
+- task{
+	- task  		object_ref
+	- station 		number
+}
 // ADDITIONAL FIELD
-
+Function:
+- get_earliest_start_time(next_station)
+	calculate the earliest slot possible to start
+	next_station's work
 
 ====== Task =============
 
-- bpj_no = job_id	string
-- tech_id			string
+- Job				ref
+- Technician		ref
 - date				date
 - start_slot		number
 - duration			number (slot) ,30min = 1 slot
 - note				string
 - locked			boolean
 - station 			number
-- skill_requirements -> skill_id (FACTORY-SKILL.LEVEL)
+- skill_level		number -> skill_id (FACTORY-SKILL.LEVEL)
 
 >>>>>>>>>> LATER
 - ot
