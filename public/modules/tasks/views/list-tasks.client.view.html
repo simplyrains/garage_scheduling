@@ -1,7 +1,59 @@
 <section data-ng-controller="TasksController" data-ng-init="find()">
     <div class="page-header">
-        <h1>Tasks {{status}} / {{status2}}</h1>
+        <h1>Job</h1>
     </div>
+
+    <div class="row">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        BPJ No.
+                    </th>
+                    <th>
+                        Start Date
+                    </th>
+                    <th>
+                        TopServ
+                    </th>
+                    <th>
+                        Work Type
+                    </th>
+
+                    <th ng-repeat="choice in factoryChoice">
+                        {{choice.name}}
+                    </th>
+                    <th>
+                        Add to plan
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="job in jobs">
+                    <td>{{job.bpj_no}}</td>
+                    <td>{{job.start_dt | date:'dd/MM'}}</td>
+                    <td>{{job.topserv_hr}}</td>
+                    <td>{{workTypeChoice[job.work_level].name}}</td>
+                    <td ng-repeat="h in job.approx_hrs">{{h.time}}</td>
+                    <td>
+                        <a ng-class="job.is_in_plan ? 'disabled' : ''" class="btn btn-primary" href="/#!/jobs/{{job._id}}/edit">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </a>
+
+                        <a ng-if="!job.is_in_plan" class="btn-success btn" ng-click="addToPlan(job);">
+                            <i class="glyphicon glyphicon-play"></i>
+                        </a>
+                        <a  ng-if="job.is_in_plan" class="btn-warning disabled btn">
+                            <i class="glyphicon glyphicon-lock"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <h1>Schedule {{status}} / {{status2}}</h1>
+
     <div class="row">
         <table class="table table-bordered table-condensed">
             <thead>
@@ -50,15 +102,14 @@
     <div class="list-group">
         <a data-ng-repeat="task in tasks" data-ng-href="#!/tasks/{{task._id}}" class="list-group-item">
 			<small class="list-group-item-text">
-				Posted on
-				<span data-ng-bind="task.created | date:'medium'"></span>
-				by
-				<span data-ng-bind="task.user.displayName"></span>
+				<span data-ng-bind="task.job.name_plate"></span>
+                <span data-ng-bind="task.station"></span>
+                <span data-ng-bind="factoryChoice[task.station].name"></span>
+
+                <span data-ng-bind="task.duration"></span>
+                <span data-ng-bind="slot[task.start_slot].name"></span>
 			</small>
-			<h4 class="list-group-item-heading" data-ng-bind="task.name"></h4>
+			<h4 class="list-group-item-heading" data-ng-bind="task.job.bpj_no"></h4>
         </a>
-    </div>
-    <div class="alert alert-warning text-center" data-ng-hide="!tasks.$resolved || tasks.length">
-    	No Tasks yet, why don't you <a href="/#!/tasks/create">create one</a>?
     </div>
 </section>

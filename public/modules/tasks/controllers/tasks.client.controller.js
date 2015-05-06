@@ -17,7 +17,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				note: this.note,
 				locked: this.locked,
 				station: this.station,
-				skill_requirements: this.skill_requirements
+				skill_level: this.skill_level
 			});
 			// Redirect after save
 			task.$save(function(response) {
@@ -32,7 +32,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				$scope.note = '';
 				$scope.locked = '';
 				$scope.station = '';
-				$scope.skill_requirements = '';
+				$scope.skill_level = '';
 
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
@@ -151,6 +151,16 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				{id: 7, name: 'QC'}
 			];
 
+			$scope.workTypeChoice = [
+				{id: 0, name: 'L1'},
+				{id: 1, name: 'L2'},
+				{id: 2, name: 'L3'},
+				{id: 3, name: 'M1'},
+				{id: 4, name: 'M2'},
+				{id: 5, name: 'M3'},
+				{id: 6, name: 'H1~H3'}
+			];
+			
 			$scope.skillChoice = [
 				//MAIN SKILL
 					//EXTRA SKILL 										//FACTORY-SKILL.LEVEL
@@ -223,6 +233,13 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			}
 			return -1;
 		};
+		var get_tech = function(tech__id){
+			if(!$scope.technicians) return null;
+			for(var i=0, len = $scope.technicians.length; i<len; i++){
+				if($scope.technicians[i]._id===tech__id) return $scope.technicians[i];
+			}
+			return null;
+		};
 		$scope.fill_table = function(t_task, tech_id, t_date, t_slot, table){
 
 			var duration = t_task.duration;
@@ -241,33 +258,70 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			}
 			return true;
 		};
-		$scope.check_fill_table = function(t_task, tech_id, t_date, t_slot, table){
+		// $scope.check_fill_table = function(t_task, tech_id, t_date, t_slot, table){
 
-			var duration = t_task.duration;
-			var row = $scope.calc_row(t_date, t_slot);
-			var index_technician = $scope.find_tech_index(tech_id);
-			//check if the slot is free, if not we'll return
+		// 	var duration = t_task.duration;
+		// 	var row = $scope.calc_row(t_date, t_slot);
+		// 	var index_technician = $scope.find_tech_index(tech_id);
+		// 	//check if the slot is free, if not we'll return
 
-			var i=0;			
-			while(duration>0){
-				if($scope.table[row+i][index_technician].is_holiday===true) i++;
-				else if($scope.table[row+i][index_technician].task!==null) i++;
-				else{
-					i++;
-					duration--;
-				}
-			}
-			return {
-				t_date: new Date().setDate(t_date.getDate() + i),
-				slots: i
-			};
-		};
+		// 	var i=0;			
+		// 	while(duration>0){
+		// 		if($scope.table[row+i][index_technician].is_holiday===true) i++;
+		// 		else if($scope.table[row+i][index_technician].task!==null) i++;
+		// 		else{
+		// 			i++;
+		// 			duration--;
+		// 		}
+		// 	}
+		// 	return {
+		// 		t_date: new Date().setDate(t_date.getDate() + i),
+		// 		slots: i
+		// 	};
+		// };
 		$scope.fill_table_ready_task = function(t_task){				
 			$scope.fill_table(t_task, t_task.technician.tech_id, new Date(t_task.date), t_task.start_slot, t_task.duration);
 		};
 		$scope.display_cell = function(cell){
 			if(cell.task===null) return false;
 			return true;
+		};
+
+		// FUNCTION
+
+		var saveResponseF = function(response) {
+					console.log('SAVE > '+response._id);
+					console.log(response);
+					//response.job = get_tech(response.job);
+					//$scope.fill_table_ready_task(response);
+				};
+
+		var errorResponseF = function(errorResponse) {
+					$scope.error = errorResponse.data.message;
+				};
+
+		$scope.addToPlan = function(job){
+			job.is_in_plan = true;
+			//TODO: check available slot
+
+			//confirm slot: fill
+			//technician
+			//date
+			//start_slot
+			for(var i=0, len=job.approx_hrs.length; i<len; i++){	
+				var duration = Math.ceil(job.approx_hrs[i].time*2);
+				var task = new Tasks ({
+					job: job._id,
+					technician: $scope.technicians[i]._id,
+					date: new Date(),
+					start_slot: 1,
+					duration: duration,
+					station: job.approx_hrs[i].station,
+					skill_level: job.work_level
+				});
+				console.log(task);
+				task.$save(saveResponseF, errorResponseF);
+			}
 		};
 
 		$scope.init();

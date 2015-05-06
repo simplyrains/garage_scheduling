@@ -53,12 +53,13 @@
                         </select>
                     </div>
 
-                    <label class="control-label" for="skill_requirements">skill_requirements</label>
+
+                    <label class="control-label" for="skill_level">skill_level</label>
                     <div class="controls">
-                        <select ng-model="task.skill_requirements" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
-                            <option value="">-- เลือกความสามารถ --</option>
-                        </select>                   
-                    </div>       
+                        <select ng-model="task.skill_level" ng-options="skill.id as skill.name for skill in workTypeChoice">
+                          <option value="">-- เลือกระดับ --</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Update" class="btn btn-default">
