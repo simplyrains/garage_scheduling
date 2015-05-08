@@ -77,6 +77,12 @@ angular.module('technicians').controller('TechniciansController', ['$scope', '$s
 		$scope.addExHolidayInputC = function(){
 			$scope.tech_exholidays.push({start:new Date(), end:new Date()});
 		};
+		$scope.removeSkillInputC = function(i){
+			$scope.tech_skills.splice(i,1);
+		};
+		$scope.removeExHolidayInputC = function(i){
+			$scope.tech_exholidays.splice(i,1);
+		};
 
 		// For Edit
 		$scope.addSkillInputE = function(){
@@ -84,6 +90,12 @@ angular.module('technicians').controller('TechniciansController', ['$scope', '$s
 		};
 		$scope.addExHolidayInputE = function(){
 			$scope.techinician.tech_exholidays.push({start:new Date(), end:new Date()});
+		};
+		$scope.removeSkillInputE = function(i){
+			$scope.technician.tech_skills.splice(i,1);
+		};
+		$scope.removeExHolidayInputE = function(i){
+			$scope.technician.tech_exholidays.splice(i,1);
 		};
 
 		// Create new Technician

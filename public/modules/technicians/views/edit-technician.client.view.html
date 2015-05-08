@@ -51,22 +51,26 @@
                     
                     <label class="control-label" for="tech_exholidays">tech_exholidays</label>
                     <div class="controls">
+                        <button type="button" ng-click="addExHolidayInputE()">เพิ่ม</button>
+
                         <div ng-repeat="exholiday in technician.tech_exholidays track by $index">
                              <input type="datetime-local" data-ng-model="exholiday.start" class="form-control" placeholder="วันที่">                            
                             <input type="datetime-local" data-ng-model="exholiday.end" class="form-control" placeholder="วันที่">
+                            <button type="button" ng-click="removeExHolidayInputE($index)">ลบ</button>
 
                         </div>
-                        <button type="button" ng-click="addSkillInputC()">เพิ่ม</button>
                     </div>
 
                     <label class="control-label" for="tech_skills">tech_skill</label>
                     <div class="controls">
+                        <button type="button" ng-click="addSkillInputE()">เพิ่ม</button>
+
                         <div ng-repeat="tech_skill in technician.tech_skills track by $index">
                             <select ng-model="tech_skill.skill_id" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
                               <option value="">-- เลือกความสามารถ --</option>
                             </select>
+                            <button type="button" ng-click="removeSkillInputE($index)">ลบ</button>
                         </div>
-                        <button type="button" ng-click="addExHolidayInputE()">เพิ่ม</button>
 
                     </div>
                 </div>

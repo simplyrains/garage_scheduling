@@ -56,6 +56,8 @@
                             <select ng-model="tech_skill.skill_id" ng-options="skill.skill_id as skill.name group by skill.factory for skill in skillChoice">
                               <option value="">-- เลือกความสามารถ --</option>
                             </select>
+                            <button type="button" ng-click="removeSkillInputC($index)">ลบ</button>
+
                         </div>
 
                     </div>
@@ -70,6 +72,8 @@
                             <label class="control-label" for="exholiday.end">จบ</label>
                             <input type="datetime-local" data-ng-model="exholiday.end" class="form-control" placeholder="วันที่">
                         </div>
+                        <button type="button" ng-click="removeExHolidayInputC($index)">ลบ</button>
+
                     </div>
 
                 </div>

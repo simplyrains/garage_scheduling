@@ -4,12 +4,12 @@
     </div>
     <div class="list-group">
         <div data-ng-repeat="technician in technicians" class="list-group-item">
-            <a data-ng-href="#!/technicians/{{technician._id}}">
+            <a data-ng-href="/#!/technicians/{{technician._id}}/edit">
                 <h4 class="list-group-item-heading" data-ng-bind="technician.tech_fullname"></h4>
             </a>
-            <a class="btn btn-primary" href="/#!/technicians/{{technician._id}}/edit">
-                <i class="glyphicon glyphicon-edit"></i>
-            </a>
+            <ul>
+                <li ng-repeat="skill in technician.tech_skills" data-ng-bind="skill.skill_id"></li>
+            </ul>
 
         </div>
 
