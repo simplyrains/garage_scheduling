@@ -19,9 +19,6 @@ var TaskSchema = new Schema({
 		type: Schema.ObjectId,
 		ref: 'Technician'
 	},
-	date: {
-		type: Date
-	},
 	start_slot: {
 		type: Number
 	},

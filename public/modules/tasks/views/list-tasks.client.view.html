@@ -80,16 +80,16 @@
             <tbody>
                 <tr ng-repeat="row in table" ng-class="slot-{{$index%16}}">
                     <td>
-                        {{$index}}
+                        {{$index+row_start}}
                     </td>
                     <td style="font-size: small;">
-                        {{calc_date($index) | date:'dd/MM'}}
+                        {{calc_date($index+row_start) | date:'dd/MM'}}
                     </td>
                     <td style="font-size: xx-small; white-space: nowrap;">
                         {{slot[$index%16].time}}
                     </td>
                     <td ng-repeat="cell in row track by $index" ng-class="cell.is_holiday ? 'danger' : '' ">
-                        <a ng-if="display_cell(cell)" class="btn btn-primary" href="/#!/tasks/{{cell.task._id}}/edit">
+                        <a ng-if="display_cell(cell)" class="btn" style="color: white;" ng-style="{'background-color':getBg(cell.task.job.bpj_no)}" href="/#!/tasks/{{cell.task._id}}/edit">
                             {{cell.task.job.name_plate}}
                         </a>
                     </td>
