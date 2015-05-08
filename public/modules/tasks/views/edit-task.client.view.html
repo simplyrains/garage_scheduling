@@ -46,6 +46,10 @@
                         <input type="checkbox" data-ng-model="task.locked" id="locked" class="form-control">
                     </div>
 
+                    <label class="control-label" for="is_in_plan">is_in_plan</label>
+                    <div class="controls">
+                        <input type="checkbox" data-ng-model="task.is_in_plan" id="is_in_plan" class="form-control">
+                    </div>
                     <label class="control-label" for="station">station</label>
                     <div class="controls">
                         <select ng-model="task.tech_main_station" ng-options="factory.id as factory.name for factory in factoryChoice">

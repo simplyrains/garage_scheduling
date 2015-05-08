@@ -1,6 +1,6 @@
 <section data-ng-controller="TasksController" data-ng-init="find()">
     <div class="page-header">
-        <h1>Job</h1>
+        <h1>Incoming Jobs</h1>
     </div>
 
     <div class="row">
@@ -36,15 +36,68 @@
                     <td>{{workTypeChoice[job.work_level].name}}</td>
                     <td ng-repeat="h in job.approx_hrs">{{h.time}}</td>
                     <td>
-                        <a ng-class="job.is_in_plan ? 'disabled' : ''" class="btn btn-primary" href="/#!/jobs/{{job._id}}/edit">
+                        <a class="btn btn-primary" href="/#!/jobs/{{job._id}}/edit">
                             <i class="glyphicon glyphicon-edit"></i>
                         </a>
 
-                        <a ng-if="!job.is_in_plan" class="btn-success btn" ng-click="addToPlan(job);">
+                        <a class="btn-success btn" ng-click="addToPlan(job);">
                             <i class="glyphicon glyphicon-play"></i>
                         </a>
-                        <a  ng-if="job.is_in_plan" class="btn-warning disabled btn">
-                            <i class="glyphicon glyphicon-lock"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="page-header">
+        <h1>Jobs in plan</h1>
+    </div>
+    <div class="row">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        BPJ No.
+                    </th>
+                    <th>
+                        Start Date
+                    </th>
+                    <th>
+                        TopServ
+                    </th>
+                    <th>
+                        Work Type
+                    </th>
+                    <th>
+                        Dead Line
+                    </th>
+                    <th>
+                        Late
+                    </th>
+
+                    <th ng-repeat="choice in factoryChoice">
+                        {{choice.name}}
+                    </th>
+                    <th>
+                        Change Priority
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="job in current_jobs">
+                    <td>{{job.bpj_no}}</td>
+                    <td>{{job.start_dt | date:'dd/MM'}}</td>
+                    <td>{{job.topserv_hr}}</td>
+                    <td>{{workTypeChoice[job.work_level].name}}</td>
+                    <td>{{job.retrieve_dt | date:'dd/MM'}}</td>
+                    <td>Late x day</td>
+                    <td ng-repeat="h in job.approx_hrs">{{h.time}}</td>
+                    <td>
+                        <a class="btn-success btn" ng-click="movePriorityUp($index);">
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </a>
+                        <a class="btn-warning btn" ng-click="movePriorityDown($index);">
+                            <i class="glyphicon glyphicon-arrow-down"></i>
                         </a>
                     </td>
                 </tr>
@@ -54,6 +107,25 @@
     
     <h1>Schedule {{status}} / {{status2}}</h1>
 
+    <div class="row">
+        <div class="col-md-5">
+            Choose current slot: ({{row_start}} ~ {{row_start+table.length-1}})
+        </div>
+
+        <div class="col-md-1">
+            <div class="controls">
+                <input type="textarea" data-ng-model="chosen_slot" id="chosen_slot" class="form-control">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <a class="btn-warning btn" ng-click="remove_after(chosen_slot);">
+                <i class="glyphicon glyphicon-eject"></i>
+            </a>
+            <a class="btn-success btn" ng-click="put_in_plan();">
+                <i class="glyphicon glyphicon-play"></i>
+            </a>
+        </div>
+    </div>
     <div class="row">
         <table class="table table-bordered table-condensed">
             <thead>
@@ -99,8 +171,10 @@
 
     </div>
     
+    <h1>Task Status</h1>
+
     <div class="list-group">
-        <a data-ng-repeat="task in tasks" data-ng-href="#!/tasks/{{task._id}}" class="list-group-item">
+        <a data-ng-repeat="task in current_tasks" data-ng-href="#!/tasks/{{task._id}}" class="list-group-item" ng-class="task.is_in_plan ? 'list-group-item-success' : 'list-group-item-danger'">
 			<small class="list-group-item-text">
 				<span data-ng-bind="task.job.name_plate"></span>
                 <span data-ng-bind="task.station"></span>

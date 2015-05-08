@@ -65,10 +65,6 @@ var JobSchema = new Schema({
 	tel_info: {
 		type: String
 	},
-	is_in_plan: {
-		type: Boolean,
-		default: false
-	},
 	tasks: [
 		{
 			type: Schema.ObjectId,

@@ -20,7 +20,8 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				note: this.note,
 				locked: this.locked,
 				station: this.station,
-				skill_level: this.skill_level
+				skill_level: this.skill_level,
+				is_in_plan: this.is_in_plan
 			});
 			// Redirect after save
 			task.$save(function(response) {
@@ -35,6 +36,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				$scope.locked = '';
 				$scope.station = '';
 				$scope.skill_level = '';
+				$scope.is_in_plan = false;
 
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
@@ -214,7 +216,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 
 		    $scope.jobs = Jobs.query();
 		    $scope.technicians = Technicians.query();
-
+		    $scope.current_jobs = [];
 		};
 
 		//Helper function
@@ -342,115 +344,204 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			color = color.substring(0,4);
 			return color;
 		};
+		$scope.movePriorityUp = function(index){
+			if(index === 0) return;
+			var temp;
+			temp = $scope.current_jobs[index];
+			$scope.current_jobs[index] = $scope.current_jobs[index-1];
+			$scope.current_jobs[index-1] = temp;
+		};
+		$scope.movePriorityDown = function(index){
+			if(index+1 === $scope.current_jobs.length) return;
+			var temp;
+			temp = $scope.current_jobs[index];
+			$scope.current_jobs[index] = $scope.current_jobs[index+1];
+			$scope.current_jobs[index+1] = temp;
+		};
+		//UNTESTED FUNCTION
+		var getPriority = function(job) {
+			for (var i in $scope.jobs) {
+				if ($scope.jobs[i].bpj_no === job.bpj_no) {
+					return i;
+				}
+			}	
+		};
+		$scope.remove_after = function(chosen_slot){
 
-		// FUNCTION
-		var saveResponseF = function(response) {
-					console.log('SAVE > '+response._id);
-					console.log(response);
-					//response.job = get_tech(response.job);
-					//$scope.fill_table_ready_task(response);
-				};
-		var errorResponseF = function(errorResponse) {
-					$scope.error = errorResponse.data.message;
-				};
-		$scope.addToPlan = function(job){
-			job.is_in_plan = true;
-			//TODO: check available slot
-
-			var start_slot = $scope.calc_slot_id(new Date(job.start_dt), 0);
-			var tasks = [];
-			for(var i=0, len=job.approx_hrs.length; i<len; i++){
-				var duration = Math.ceil(job.approx_hrs[i].time*2);
-				
-				//Skip this task if duration==0
-				if(duration === 0) continue;
-
-				var results = [];
+			for(var i=0, len = $scope.table.length; i<len; i++){
+				var slot_id = i+$scope.row_start;
 				for(var j=0, lenn = $scope.technicians.length; j<lenn; j++){
-					var result = check_free_slot(
-						job.approx_hrs[i].station, 
-						job.work_level, 
-						duration,
-						j, 
-						start_slot);
-					if(result.possible === true){
-						results.push(result);
+					if($scope.table[i][j].is_holiday) continue;
+					if($scope.table[i][j].task){
+						var task = $scope.table[i][j].task;
+						if(task.start_slot > chosen_slot){
+							task.is_in_plan =false;
+							$scope.table[i][j].task = null;
+						}
 					}
 				}
-				if(results.length === 0) return false; //impossible in this time span
+			}
 
-				//Choose the best result
-				var earliest_slot = results[0].end_slot;
+		};
 
-				var point;
-				var lowest_point = (results[0].tech_main_station===job.approx_hrs[i].station)? 0 : 1;
+		// FUNCTION
+		// var saveResponseF = function(response) {
+		// 	console.log('SAVE > '+response._id);
+		// 	console.log(response);
+		// 	//response.job = get_tech(response.job);
+		// 	//$scope.fill_table_ready_task(response);
+		// };
+		// var errorResponseF = function(errorResponse) {
+		// 	$scope.error = errorResponse.data.message;
+		// };
+		$scope.put_in_plan = function(){
+			var tasks_with_priority = [];
 
-				var lowest_skill = results[0].skill_level;
-				var chosen_result = results[0];
-				for(j = 0, lenn = results.length; j<lenn; j++){
-					point = (results[j].tech_main_station===job.approx_hrs[i].station)? 0 : 1;
+			for (var i in $scope.current_tasks) {
+				var task = $scope.current_tasks[i];
+				var priority = getPriority(task.job)*10 + task.station;
+				tasks_with_priority.push({
+					task: task,
+					priority: priority
+				});
+			}	
+			tasks_with_priority.sort(function(a,b) {
+				return a.priority-b.priority;
+			});
+			console.log('Task to be add:');
+			for(var j=0, len=tasks_with_priority.length; j<len; j++){
+				console.log(tasks_with_priority[j]);
+				//TODO add to plan
+			}
+		};
+		var add_task_to_plan = function(task, start_slot){
+			var prev_task = task.prerequisite;
+			var prev_station = 0;
+			if(prev_task){
+				prev_station = prev_task.station;
+			} 
+			//Special case: if previous station = พ่นสี (3) need to wait 1 hr = 2 slots
+			if(prev_station === 3) start_slot+=2;
+			//Special case: if previous station = ขัดสี (5) need to wait 0.5 hr = 1 slot
+			else if(prev_station === 5) start_slot+=1;
 
-					if(results[j].end_slot<earliest_slot){
+			var results = [];
+			var job = task.job;
+			for(var j=0, lenn = $scope.technicians.length; j<lenn; j++){
+				var result = check_free_slot(
+					task.station, 
+					task.skill_level, 
+					task.duration,
+					task.station, 
+					start_slot);
+				if(result.possible === true){
+					results.push(result);
+				}
+			}
+			if(results.length === 0) return -1; //impossible in this time span
+
+			//Choose the best result
+			var earliest_slot = results[0].end_slot;
+
+			var point;
+			var lowest_point = (results[0].tech_main_station===task.station)? 0 : 1;
+
+			var lowest_skill = results[0].skill_level;
+			var chosen_result = results[0];
+			for(j = 0, lenn = results.length; j<lenn; j++){
+				point = (results[j].tech_main_station===task.station)? 0 : 1;
+
+				if(results[j].end_slot<earliest_slot){
+					earliest_slot = results[j].end_slot;
+					lowest_skill = results[j].skill_level;
+					lowest_point = point;
+					chosen_result = results[j];
+				}
+				else if(results[j].end_slot === earliest_slot){
+					if(point < lowest_point){
 						earliest_slot = results[j].end_slot;
 						lowest_skill = results[j].skill_level;
 						lowest_point = point;
 						chosen_result = results[j];
 					}
-					else if(results[j].end_slot === earliest_slot){
-						if(point < lowest_point){
+					else if(point === lowest_point){
+						if(results[j].skill_level < lowest_skill){
 							earliest_slot = results[j].end_slot;
 							lowest_skill = results[j].skill_level;
 							lowest_point = point;
 							chosen_result = results[j];
 						}
-						else if(point === lowest_point){
-							if(results[j].skill_level < lowest_skill){
-								earliest_slot = results[j].end_slot;
-								lowest_skill = results[j].skill_level;
-								lowest_point = point;
-								chosen_result = results[j];
-							}
-						}
 					}
 				}
-				console.log('Station:'+i+' -> ');
-				console.log(chosen_result);
-				//Save Task
-				// var task = new Tasks ({
-				// 	job: job._id,
-				// 	technician: $scope.technicians[chosen_result.index_technician]._id,
-				// 	start_slot: chosen_result.start_slot,
-				// 	duration: duration,
-				// 	station: job.approx_hrs[i].station,
-				// 	skill_level: job.work_level
-				// });
+			}
+			console.log('Station:'+task.station+' -> ');
+			console.log(chosen_result);
+			//Save Task
+			// var task = new Tasks ({
+			// 	job: job._id,
+			// 	technician: $scope.technicians[chosen_result.index_technician]._id,
+			// 	start_slot: chosen_result.start_slot,
+			// 	duration: duration,
+			// 	station: job.approx_hrs[i].station,
+			// 	skill_level: job.work_level
+			// });
+			
+			task.technician = $scope.technicians[chosen_result.index_technician];
+			task.start_slot = chosen_result.start_slot;
+			task.is_in_plan = true;
+
+			return chosen_result.end_slot+1;
+
+		};
+		$scope.addToPlan = function(job){
+			//move job to current_jobs
+			for (var k in $scope.jobs) {
+				if ($scope.jobs [k] === job) {
+					$scope.jobs.splice(k, 1);
+				}
+			}	
+			$scope.current_jobs.push(job);
+
+
+			//TODO: check available slot from start date, right now it's now :P
+			var start_slot = $scope.calc_slot_id(new Date(job.start_dt), 0);
+			$scope.current_tasks = [];
+			var prev_task = null;
+			for(var i=0, len=job.approx_hrs.length; i<len; i++){
+
+				var duration = Math.ceil(job.approx_hrs[i].time*2);
+				//Skip this task if duration==0
+				if(duration === 0) continue;
 
 				var task = new Tasks ({
 					job: job,
-					technician: $scope.technicians[chosen_result.index_technician],
-					start_slot: chosen_result.start_slot,
 					duration: duration,
 					station: job.approx_hrs[i].station,
-					skill_level: job.work_level
+					skill_level: job.work_level,
+					is_in_plan: false,
+					//frontend_only
+					prerequisite: prev_task
 				});
 
-				start_slot = chosen_result.end_slot+1;
-
-				//Special case: if current station = พ่นสี (3) need to wait 1 hr = 2 slots
-				if(job.approx_hrs[i].station === 3) start_slot+=2;
-				//Special case: if current station = ขัดสี (5) need to wait 0.5 hr = 1 slot
-				else if(job.approx_hrs[i].station === 5) start_slot+=1;
-
-				tasks.push(task);
+				//Add task to plan(schedule) and fill task.technician, task.start_slot
+				//will returns a slot that the filled task is complete
+				start_slot = add_task_to_plan(task, start_slot);
+				if(start_slot === -1){
+					console.log('Error, cannot add task to plan.');
+					console.log(task);
+					return false;
+				}
+				prev_task = task;
+				$scope.current_tasks.push(task);
 			}
 
 			//confirm slot: fill
 			//technician
 			//start_slot
-			for(i=0, len=tasks.length; i<len; i++){	
-				$scope.fill_table_ready_task(tasks[i]);
+			for(i=0, len=$scope.current_tasks.length; i<len; i++){	
+				$scope.fill_table_ready_task($scope.current_tasks[i]);
 
-				//tasks[i].$save(saveResponseF, errorResponseF);
+				//$scope.current_tasks[i].$save(saveResponseF, errorResponseF);
 			}
 			return true;
 		};
