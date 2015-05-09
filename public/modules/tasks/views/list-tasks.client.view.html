@@ -1,4 +1,5 @@
 <section data-ng-controller="TasksController" data-ng-init="find()">
+
     <div class="page-header">
         <h1>Incoming Jobs</h1>
     </div>
@@ -60,6 +61,9 @@
                         BPJ No.
                     </th>
                     <th>
+                        Plate No.
+                    </th>
+                    <th>
                         Start Date
                     </th>
                     <th>
@@ -69,7 +73,10 @@
                         Work Type
                     </th>
                     <th>
-                        Dead Line
+                        Deadline
+                    </th>
+                    <th>
+                        Complete Date
                     </th>
                     <th>
                         Late
@@ -85,12 +92,15 @@
             </thead>
             <tbody>
                 <tr ng-repeat="job in current_jobs">
-                    <td>{{job.bpj_no}}</td>
+                    <td>{{job.bpj_no}}</td>                    
+                    <td>{{job.name_plate}}</td>
                     <td>{{job.start_dt | date:'dd/MM'}}</td>
                     <td>{{job.topserv_hr}}</td>
                     <td>{{workTypeChoice[job.work_level].name}}</td>
-                    <td>{{job.retrieve_dt | date:'dd/MM'}}</td>
-                    <td>Late x day</td>
+                    <td>{{job.retrieve_dt | date:'dd/MM'}}</td>                    
+                    <td>{{job.complete_dt | date:'dd/MM'}}</td>
+
+                    <td>{{calc_late(job)}}</td>
                     <td ng-repeat="h in job.approx_hrs">{{h.time}}</td>
                     <td>
                         <a class="btn-success btn" ng-click="movePriorityUp($index);">
@@ -103,26 +113,86 @@
                 </tr>
             </tbody>
         </table>
+        <h3 style="text-align: right;">รวมเวลา Late <span class="label label-default">{{totalLate()}}</span> วัน</h3>
+
     </div>
     
-    <h1>Schedule {{status}} / {{status2}}</h1>
+    <h1>Schedule {{status}}</h1>
 
-    <div class="row">
-        <div class="col-md-5">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-md-3">
             Choose current slot: ({{row_start}} ~ {{row_start+table.length-1}})
         </div>
 
         <div class="col-md-1">
             <div class="controls">
-                <input type="textarea" data-ng-model="chosen_slot" id="chosen_slot" class="form-control">
+                <input type="textarea" data-ng-model="chosen_slot" id="chosen_slot" class="form-control disabled" value="0">
             </div>
+        </div>
+        <div class="col-md-2">
+
+            <a class="btn-success btn" ng-click="chosen_slot=chosen_slot+1">
+                <i class="glyphicon glyphicon-plus"></i>
+            </a>
+            <a class="btn-danger btn" ng-click="chosen_slot=chosen_slot-1">
+                <i class="glyphicon glyphicon-minus"></i>
+            </a>
         </div>
         <div class="col-md-6">
             <a class="btn-warning btn" ng-click="remove_after(chosen_slot);">
-                <i class="glyphicon glyphicon-eject"></i>
+                <i class="glyphicon glyphicon-eject"></i> ถอดรถออกจากแผน
             </a>
             <a class="btn-success btn" ng-click="put_in_plan();">
-                <i class="glyphicon glyphicon-play"></i>
+                <i class="glyphicon glyphicon-play"></i> จัดแผนใหม่
+            </a>
+        </div>
+    </div>
+    <div class="row jumbotron" ng-show="show_edit" style="margin-bottom: 20px;">
+        <div class="col-md-2">
+            <label class="control-label" for="technician">technician<br />(เดิม: {{selected_task.technician.tech_fullname}})</label>
+            <div class="controls">
+                <select ng-model="selected_task.tech_id" ng-options="t.tech_id as t.tech_fullname for t in selected_task.technicians">
+                  <option value="">-- เลือกช่าง --</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="control-label" for="start_slot">start_slot<br />(#, เริ่มได้ตั้งแต่: {{selected_task.earliest_start_time}})</label>
+            <div class="controls">
+                <input type="text" data-ng-model="selected_task.start_slot" id="start_slot" class="form-control" placeholder="start_slot">          
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="control-label" for="duration">duration<br />(1 slot=30นาที)</label>
+            <div class="controls">
+                <input type="text" data-ng-model="selected_task.duration" id="duration" class="form-control" placeholder="duration">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="control-label" for="skill_level">skill_level</label>
+            <div class="controls">
+                <select ng-model="selected_task.skill_level" ng-options="skill.id as skill.name for skill in workTypeChoice">
+                  <option value="">-- เลือกระดับ --</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+
+            <label class="control-label" for="note">note</label>
+            <div class="controls">
+                <input type="textarea" data-ng-model="selected_task.note" id="note" class="form-control" placeholder="note">
+            </div>
+        </div>
+        <div class="col-md-2">
+
+            <a class="btn-danger btn" ng-click="unlock_task(selected_task.ref_task);">
+                <i class="glyphicon glyphicon-lock"></i> ปลดล็อค
+            </a>
+            <a class="btn-success btn" ng-click="save_edit_task();">
+                <i class="glyphicon glyphicon-ok"></i> ปรับเวลาและล็อค
+            </a>
+            <a class="btn-danger btn" ng-click="cancel_edit_task();">
+                <i class="glyphicon glyphicon-remove"></i> ยกเลิก
             </a>
         </div>
     </div>
@@ -140,17 +210,24 @@
                         Time
                     </th>
                     <th ng-repeat="technician in technicians" style="font-size: xx-small; width: 150px;">
-                        {{technician.tech_id}} <br /xz>{{technician.tech_main_station}} / {{factoryChoice[technician.tech_main_station-1].name}}
+                        <br />{{technician.tech_main_station}}.{{factoryChoice[technician.tech_main_station-1].name}}
                     </th>
                 </tr>
                 <tr>
-                    <th ng-repeat="technician in technicians" style="font-size: xx-small; width: 100px; overflow: hidden; white-space: nowrap;">
+                    <th ng-repeat="technician in technicians" style="vertical-align: top; padding-bottom: 0px; font-size: xx-small; width: 100px; overflow: hidden; white-space: nowrap;">
                         {{technician.tech_fullname}}
+                        <ul>
+                            <li ng-repeat="skill in technician.tech_skills" 
+                                data-ng-bind="get_skill_desc(skill.skill_id)"
+                                ng-if="get_skill_desc(skill.skill_id).length>0"></li>
+                        </ul>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in table" ng-class="slot-{{$index%16}}">
+                <tr ng-repeat="row in table" ng-class="
+                    (chosen_slot>=$index+row_start) ? 'danger' : '' 
+                    ">
                     <td>
                         {{$index+row_start}}
                     </td>
@@ -161,8 +238,12 @@
                         {{slot[$index%16].time}}
                     </td>
                     <td ng-repeat="cell in row track by $index" ng-class="cell.is_holiday ? 'danger' : '' ">
-                        <a ng-if="display_cell(cell)" class="btn" style="color: white;" ng-style="{'background-color':getBg(cell.task.job.bpj_no)}" href="/#!/tasks/{{cell.task._id}}/edit">
+                        <a ng-if="display_cell(cell)" class="btn" style="color: white;"
+                        ng-style="{'background-color':getBg(cell.task.job.bpj_no)}"
+                        ng-click="edit_task(cell.task);">
                             {{cell.task.job.name_plate}}
+                            <i ng-if="!is_moveable(cell.task) && cell.task.locked" class="glyphicon glyphicon-lock"></i>
+                            <i ng-if="is_moveable(cell.task)" class="glyphicon glyphicon-ban-circle"></i>
                         </a>
                     </td>
                 </tr>
@@ -174,7 +255,7 @@
     <h1>Task Status</h1>
 
     <div class="list-group">
-        <a data-ng-repeat="task in current_tasks" data-ng-href="#!/tasks/{{task._id}}" class="list-group-item" ng-class="task.is_in_plan ? 'list-group-item-success' : 'list-group-item-danger'">
+        <a data-ng-repeat="task in current_tasks" ng-click="edit_task(cell.task);" class="list-group-item" ng-class="task.is_in_plan ? 'list-group-item-success' : 'list-group-item-danger'">
 			<small class="list-group-item-text">
 				<span data-ng-bind="task.job.name_plate"></span>
                 <span data-ng-bind="task.station"></span>

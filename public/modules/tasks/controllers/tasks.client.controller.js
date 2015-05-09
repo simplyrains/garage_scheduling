@@ -1,7 +1,9 @@
 'use strict';
 
+
 // Tasks controller
-angular.module('tasks').controller('TasksController', ['$scope', '$stateParams', '$location', 'Authentication', 'Tasks', 'Jobs', 'Technicians',
+angular.module('tasks').controller('TasksController', ['$scope', '$stateParams', 
+	'$location', 'Authentication', 'Tasks', 'Jobs', 'Technicians',
 	function($scope, $stateParams, $location, Authentication, Tasks, Jobs, Technicians) {
 		$scope.authentication = Authentication;
 
@@ -107,11 +109,11 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			    	if($scope.tasks){
 						for(var x=0, len = $scope.tasks.length; x<len; x++){
 							if($scope.tasks[x].technician !== null){
-								$scope.fill_table_ready_task($scope.tasks[x]);
+								$scope.fill_table($scope.tasks[x]);
 								counter++;
 							}
 						}
-						$scope.status = 'Filled '+counter+' blocks.';
+						$scope.status = '-> complete!';
 					}
 	    		})
 	    		;
@@ -217,9 +219,19 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		    $scope.jobs = Jobs.query();
 		    $scope.technicians = Technicians.query();
 		    $scope.current_jobs = [];
+		    $scope.current_tasks = [];
+		    $scope.show_edit = false;
+		    $scope.chosen_slot = $scope.row_start;
 		};
 
 		//Helper function
+		$scope.totalLate = function(){
+			var late = 0;
+			for(var i in $scope.current_jobs){
+				late+=$scope.calc_late($scope.current_jobs[i]);
+			}
+			return late;
+		};
 		$scope.getDateDiff = function(date1, date2) {
 		    date1.setHours(0, 0, 0, 0);
 		    date2.setHours(0, 0, 0, 0);
@@ -244,6 +256,15 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			}
 			return -1;
 		};
+		$scope.get_skill_desc = function(skill_id){
+
+			for (var k in $scope.skillChoice) {
+				if ($scope.skillChoice[k].skill_id === skill_id) {
+					if($scope.skillChoice[k].skill_id.substring(2,3)!=='A') return '';
+					else return $scope.skillChoice[k].name;
+				}
+			}	
+		};
 		// var get_tech = function(tech__id){
 		// 	if(!$scope.technicians) return null;
 		// 	for(var i=0, len = $scope.technicians.length; i<len; i++){
@@ -251,29 +272,30 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		// 	}
 		// 	return null;
 		// };
-		$scope.fill_table = function(t_task, tech_id, t_startslot, table){
+		$scope.fill_table = function(task){
 
-			var duration = t_task.duration;
-			var index_technician = $scope.find_tech_index(tech_id);
-			//check if the slot is free, if not we'll return
-			//console.log(t_startslot+' '+index_technician);
-			var i;			
-			for(i = 0; i<duration; i++){
-				if($scope.table[t_startslot-$scope.row_start+i][index_technician].is_holiday===true) return false;
-				if($scope.table[t_startslot-$scope.row_start+i][index_technician].task!==null) return false;
+
+			//NOTE: some duplicate with  < check_free_slot >
+			var station = task.station;
+			var duration = task.duration;
+			var index_technician = $scope.find_tech_index(task.technician.tech_id);
+			var start_slot = task.start_slot;
+			var end_slot = task.end_slot;
+			var d = duration;
+			var k;
+			for(k=start_slot; k<=end_slot; k++){
+				if($scope.table[k-$scope.row_start][index_technician].is_holiday===false){
+					$scope.table[k-$scope.row_start][index_technician].task = task;
+				}
 			}
-			//this slot is available
-			for(i = 0; i<duration; i++){
-				$scope.table[t_startslot-$scope.row_start+i][index_technician].task = t_task;
-			}
-			return true;
 		};
 		var check_skill = function(technician, station){
+			if(!technician.tech_skills) return -1;
 			var tech_skills = technician.tech_skills;
 			var max_level = -1;
 			for(var i=0, len = tech_skills.length; i<len;i++){
 				var skill = tech_skills[i].skill_id;
-				//console.log(skill);
+			
 				if(skill.length===0) continue;
 				if(!skill) continue;
 				var res = skill.split('-');
@@ -282,28 +304,49 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				var level = parseInt(res2[1]);
 				if(_station===station && level>max_level) max_level = level;
 			}
-			return max_level;
+
+			if(station ===1||station===2||station===4){
+				return max_level;
+			}
+			//these station require no skill level
+			else if(max_level>=0){
+				return 99;
+			}
+			//no skill for this station
+			return -1;
+		};
+		var calc_start_time = function(task){
+			var start_slot;
+			if(!task.prerequisite){
+				start_slot = $scope.calc_slot_id(new Date(task.job.start_dt), 0);
+				if(start_slot<$scope.row_start) start_slot = $scope.row_start;
+				return start_slot;
+			}
+			start_slot = task.prerequisite.end_slot+1;
+			//Special case: if previous station = พ่นสี (3) need to wait 1 hr = 2 slots
+			if(task.prerequisite.station === 3) start_slot+=2;
+			//Special case: if previous station = ขัดสี (5) need to wait 0.5 hr = 1 slot
+			else if(task.prerequisite.station === 5) start_slot+=1;
+			return start_slot;
+
 		};
 		var check_free_slot = function(station, skill_level, duration, index_technician, t_startslot){
 			//Check if the technician is capable of doing this work
-			//console.log('Check skill '+station+' for '+ $scope.technicians[index_technician]);
+		
 			var _skill_level = check_skill($scope.technicians[index_technician], station);
 			// _skill_level = -1 means no skill
 			if(_skill_level === -1) return {possible: false};
-			if(station ===1||station===2||station===4){
-				if(_skill_level<skill_level) return {possible: false};
-			}
 
 			//Check the time he is available
 			//check if the slot is free, if not we'll return
 			var start=-1;	
 			var d = duration;
-			//console.log(t_startslot+' x '+$scope.row_start);
+		
 
 			if(t_startslot<$scope.row_start) t_startslot = $scope.row_start;
 			var k;
 			for(k=0; k<$scope.table.length && d>0; k++){
-				console.log(t_startslot-$scope.row_start+k+'/'+index_technician);
+			
 				//An occupied slot
 				if($scope.table[t_startslot-$scope.row_start+k][index_technician].task!==null){
 					d = duration;
@@ -317,7 +360,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				//Holiday Slot: do nothing
 			}
 			if(d>0) return {possible: false};
-			//console.log('x');
+		
 			return {
 				possible: true,
 				index_technician: index_technician,
@@ -327,12 +370,15 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				end_slot: t_startslot+k-1
 			};
 		};
-		$scope.fill_table_ready_task = function(t_task){				
-			$scope.fill_table(t_task, t_task.technician.tech_id, t_task.start_slot, t_task.duration);
-		};
 		$scope.display_cell = function(cell){
 			if(cell.task===null) return false;
 			return true;
+		};
+		$scope.calc_late = function(job){
+			return $scope.getDateDiff(
+				new Date(job.retrieve_dt),
+				new Date(job.complete_dt)
+			);
 		};
 		$scope.getBg = function(s){
 			var ss = s.substring(s.length-3,s.length);
@@ -360,11 +406,12 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		};
 		//UNTESTED FUNCTION
 		var getPriority = function(job) {
-			for (var i in $scope.jobs) {
-				if ($scope.jobs[i].bpj_no === job.bpj_no) {
+			for (var i in $scope.current_jobs) {
+				if ($scope.current_jobs[i].bpj_no === job.bpj_no) {
 					return i;
 				}
 			}	
+			return -1;
 		};
 		$scope.remove_after = function(chosen_slot){
 
@@ -374,6 +421,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					if($scope.table[i][j].is_holiday) continue;
 					if($scope.table[i][j].task){
 						var task = $scope.table[i][j].task;
+						if(task.locked) continue;
 						if(task.start_slot > chosen_slot){
 							task.is_in_plan =false;
 							$scope.table[i][j].task = null;
@@ -386,10 +434,10 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 
 		// FUNCTION
 		// var saveResponseF = function(response) {
-		// 	console.log('SAVE > '+response._id);
-		// 	console.log(response);
+	
+	
 		// 	//response.job = get_tech(response.job);
-		// 	//$scope.fill_table_ready_task(response);
+		// 	//$scope.fill_table(response);
 		// };
 		// var errorResponseF = function(errorResponse) {
 		// 	$scope.error = errorResponse.data.message;
@@ -400,6 +448,8 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			for (var i in $scope.current_tasks) {
 				var task = $scope.current_tasks[i];
 				var priority = getPriority(task.job)*10 + task.station;
+				if(task.is_in_plan) continue;				
+				if(task.locked) continue;
 				tasks_with_priority.push({
 					task: task,
 					priority: priority
@@ -408,36 +458,30 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			tasks_with_priority.sort(function(a,b) {
 				return a.priority-b.priority;
 			});
-			console.log('Task to be add:');
 			for(var j=0, len=tasks_with_priority.length; j<len; j++){
-				console.log(tasks_with_priority[j]);
-				//TODO add to plan
+				add_task_to_plan(tasks_with_priority[j].task);
 			}
 		};
-		var add_task_to_plan = function(task, start_slot){
-			var prev_task = task.prerequisite;
-			var prev_station = 0;
-			if(prev_task){
-				prev_station = prev_task.station;
-			} 
-			//Special case: if previous station = พ่นสี (3) need to wait 1 hr = 2 slots
-			if(prev_station === 3) start_slot+=2;
-			//Special case: if previous station = ขัดสี (5) need to wait 0.5 hr = 1 slot
-			else if(prev_station === 5) start_slot+=1;
+		var add_task_to_plan = function(task){
+
+			var start_slot = calc_start_time(task);
 
 			var results = [];
-			var job = task.job;
+
+			//check_free_slot = function(station, skill_level, duration,
+			//index_technician, t_startslot){
+
 			for(var j=0, lenn = $scope.technicians.length; j<lenn; j++){
 				var result = check_free_slot(
 					task.station, 
 					task.skill_level, 
 					task.duration,
-					task.station, 
+					j, 
 					start_slot);
 				if(result.possible === true){
 					results.push(result);
 				}
-			}
+			}				
 			if(results.length === 0) return -1; //impossible in this time span
 
 			//Choose the best result
@@ -474,24 +518,20 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					}
 				}
 			}
-			console.log('Station:'+task.station+' -> ');
-			console.log(chosen_result);
-			//Save Task
-			// var task = new Tasks ({
-			// 	job: job._id,
-			// 	technician: $scope.technicians[chosen_result.index_technician]._id,
-			// 	start_slot: chosen_result.start_slot,
-			// 	duration: duration,
-			// 	station: job.approx_hrs[i].station,
-			// 	skill_level: job.work_level
-			// });
-			
 			task.technician = $scope.technicians[chosen_result.index_technician];
 			task.start_slot = chosen_result.start_slot;
+			task.end_slot = chosen_result.end_slot;
 			task.is_in_plan = true;
+			
+			//Update job complete time
+			if(task.station === 7){
+				task.job.complete_dt = $scope.calc_date(task.end_slot);
+			}
 
-			return chosen_result.end_slot+1;
+			//fill the table
+			$scope.fill_table(task);
 
+			return true;
 		};
 		$scope.addToPlan = function(job){
 			//move job to current_jobs
@@ -504,46 +544,161 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 
 
 			//TODO: check available slot from start date, right now it's now :P
-			var start_slot = $scope.calc_slot_id(new Date(job.start_dt), 0);
-			$scope.current_tasks = [];
 			var prev_task = null;
-			for(var i=0, len=job.approx_hrs.length; i<len; i++){
+			for(var current_station=0; current_station<job.approx_hrs.length; current_station++){
+				var duration = Math.ceil(job.approx_hrs[current_station].time*2);
 
-				var duration = Math.ceil(job.approx_hrs[i].time*2);
 				//Skip this task if duration==0
 				if(duration === 0) continue;
 
 				var task = new Tasks ({
 					job: job,
 					duration: duration,
-					station: job.approx_hrs[i].station,
+					station: job.approx_hrs[current_station].station,
 					skill_level: job.work_level,
 					is_in_plan: false,
 					//frontend_only
-					prerequisite: prev_task
+					prerequisite: prev_task,
+					next_task: null
 				});
-
-				//Add task to plan(schedule) and fill task.technician, task.start_slot
+				if(task.prerequisite) task.prerequisite.next_task = task;
 				//will returns a slot that the filled task is complete
-				start_slot = add_task_to_plan(task, start_slot);
-				if(start_slot === -1){
-					console.log('Error, cannot add task to plan.');
-					console.log(task);
+				if(!add_task_to_plan(task)){
+					alert('error: ใส่งาน '+task.job.bpj_no+'/'+task.station+' ลง plan ไม่ได้');
+
 					return false;
 				}
+
 				prev_task = task;
 				$scope.current_tasks.push(task);
 			}
-
-			//confirm slot: fill
-			//technician
-			//start_slot
-			for(i=0, len=$scope.current_tasks.length; i<len; i++){	
-				$scope.fill_table_ready_task($scope.current_tasks[i]);
-
-				//$scope.current_tasks[i].$save(saveResponseF, errorResponseF);
-			}
 			return true;
+		};
+		$scope.edit_task = function(task){
+			if(task.end_slot<$scope.chosen_slot){
+				alert('งานจบไปแล้ว');
+			}
+			$scope.show_edit = true;
+			var possible_tech = [];
+			for(var i in $scope.technicians){
+				var technician = $scope.technicians[i];
+				var level = check_skill(technician,task.station);
+				var required = task.skill_level;
+				if(level>=required) possible_tech.push(technician);
+			}
+			$scope.selected_task = {
+				technician: task.technician,
+				start_slot: task.start_slot,
+				duration: task.duration,
+				note: task.note,
+				locked: task.locked,
+				skill_level: task.skill_level,
+				earliest_start_time: calc_start_time(task),
+				ref_task: task,
+				technicians: possible_tech
+			};
+		};
+		var lock_task = function(task){
+			var t = task;
+			while(t!==null){
+				t.locked =true;
+				t = t.prerequisite;
+			}		
+		};
+		$scope.is_moveable = function(task){
+			if(task.start_slot <= $scope.chosen_slot) return true;
+			return false;
+		};
+		$scope.unlock_task = function(task){
+			var t = task;
+			while(t!==null){
+				t.locked =false;
+				t = t.next_task;
+			}		
+		};
+		$scope.save_edit_task = function(){
+			if(parseInt($scope.selected_task.start_slot) < $scope.selected_task.earliest_start_time){
+				alert('กรอกเวลาผิด');
+				return;
+			}
+			var task = $scope.selected_task.ref_task;
+			var old_index_tachnician = $scope.find_tech_index(task.technician.tech_id);
+			var index_technician = $scope.find_tech_index($scope.selected_task.tech_id);
+
+			if($scope.is_moveable(task)){
+				if(parseInt($scope.selected_task.start_slot)!==task.start_slot ||
+					old_index_tachnician!==index_technician){
+					alert('ห้ามย้าย');
+					return;
+				}
+			}
+			//remove this task from the current timeslot
+			for(var i = task.start_slot; i <= task.end_slot;i++){
+				$scope.table[i-$scope.row_start][old_index_tachnician].task=null;
+			}
+			
+
+			//check if it replace any task *ERROR IF REPLACE A LOCKED TASK*
+			//-> calculate the earliest slot that affect
+			//NOTE: some duplicate with  < check_free_slot >
+			var station = task.station;
+			var duration = parseInt($scope.selected_task.duration);
+			if(index_technician === -1) index_technician = old_index_tachnician;
+			var t_startslot = $scope.selected_task.start_slot;
+			var start = -1;	
+			var d = duration;
+			var k;
+			var affected_slot = task.start_slot-1;
+			for(k=t_startslot-$scope.row_start; k<$scope.table.length && d>0; k++){
+			
+				//An occupied slot
+				if($scope.table[t_startslot-$scope.row_start+k][index_technician].task!==null){
+					var t = $scope.table[t_startslot-$scope.row_start+k][index_technician].task;
+					//opps, a locked slot -> error!
+					if(t.locked){
+						alert('error: ย้ายไปทับงานที่ Lock อยู่');
+						return false;
+					}
+					if(t.start_slot <= $scope.chosen_slot){
+						alert('error: ย้ายไปทับงานทีเริ่มไปแล้ว');
+						return false;
+					}
+					//calculate the affected time
+					if(t.start_slot<affected_slot) affected_slot = t.start_slot;
+					//then we'll take this slot :P
+					if(start<0) start = k;
+					d--;
+				}
+				//Free slot
+				else if($scope.table[t_startslot-$scope.row_start+k][index_technician].is_holiday===false){
+					if(start<0) start = k;
+					d--;
+				}
+				//Holiday Slot: do nothing
+			}
+			if(d>0){
+				alert('error: plan เต็มแล้ว');
+				return false;
+			}
+			//update the value of this task
+			task.technician = $scope.technicians[index_technician];
+			task.start_slot = start+$scope.row_start;
+			task.duration = duration;
+			task.note = $scope.selected_task.note;
+			task.skill_level = $scope.selected_task.skill_level;
+			task.end_slot = k+$scope.row_start-1;
+
+			lock_task(task);
+			$scope.remove_after(affected_slot-1);			
+
+			//put this slot in plan
+			$scope.fill_table(task);
+			$scope.put_in_plan();
+			
+			$scope.show_edit = false;
+		};
+		$scope.cancel_edit_task = function(){
+			$scope.show_edit = false;
 		};
 
 		$scope.init();
