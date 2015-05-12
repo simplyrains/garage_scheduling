@@ -221,7 +221,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		    $scope.current_jobs = [];
 		    $scope.current_tasks = [];
 		    $scope.show_edit = false;
-		    $scope.chosen_slot = $scope.row_start;
+		    $scope.chosen_slot = $scope.row_start-1;
 		};
 
 		//Helper function
@@ -274,17 +274,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				}
 			}	
 		};
-		// var get_tech = function(tech__id){
-		// 	if(!$scope.technicians) return null;
-		// 	for(var i=0, len = $scope.technicians.length; i<len; i++){
-		// 		if($scope.technicians[i]._id===tech__id) return $scope.technicians[i];
-		// 	}
-		// 	return null;
-		// };
 		$scope.fill_table = function(task){
-
-
-			//NOTE: some duplicate with  < check_free_slot >
 			var station = task.station;
 			var duration = task.duration;
 			var index_technician = $scope.find_tech_index(task.technician.tech_id);
@@ -295,6 +285,20 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			for(k=start_slot; k<=end_slot; k++){
 				if($scope.table[k-$scope.row_start][index_technician].is_holiday===false){
 					$scope.table[k-$scope.row_start][index_technician].task = task;
+				}
+			}
+		};
+		var unfill_table = function(task){
+			var station = task.station;
+			var duration = task.duration;
+			var index_technician = $scope.find_tech_index(task.technician.tech_id);
+			var start_slot = task.start_slot;
+			var end_slot = task.end_slot;
+			var d = duration;
+			var k;
+			for(k=start_slot; k<=end_slot; k++){
+				if($scope.table[k-$scope.row_start][index_technician].is_holiday===false){
+					$scope.table[k-$scope.row_start][index_technician].task = null;
 				}
 			}
 		};
@@ -328,7 +332,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			var start_slot;
 			if(!task.prerequisite){
 				start_slot = $scope.calc_slot_id(new Date(task.job.start_dt), 0);
-				if(start_slot<$scope.row_start) start_slot = $scope.row_start;
+				if(start_slot<=$scope.chosen_slot) start_slot = $scope.chosen_slot+1;
 				return start_slot;
 			}
 			start_slot = task.prerequisite.end_slot+1;
@@ -337,7 +341,6 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			//Special case: if previous station = ขัดสี (5) need to wait 0.5 hr = 1 slot
 			else if(task.prerequisite.station === 5) start_slot+=1;
 			return start_slot;
-
 		};
 		var check_free_slot = function(station, skill_level, duration, index_technician, t_startslot){
 			//Check if the technician is capable of doing this work
@@ -350,19 +353,18 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			//check if the slot is free, if not we'll return
 			var start=-1;	
 			var d = duration;
-		
 
-			if(t_startslot<$scope.row_start) t_startslot = $scope.row_start;
-			var k;
-			for(k=0; t_startslot-$scope.row_start+k<$scope.table.length && d>0; k++){
+			if(t_startslot<=$scope.chosen_slot) t_startslot = $scope.chosen_slot+1;
+			var k = t_startslot;
+			for(; k-$scope.row_start<$scope.table.length && d>0; k++){
 
 				//An occupied slot
-				if($scope.table[t_startslot-$scope.row_start+k][index_technician].task!==null){
+				if($scope.table[k-$scope.row_start][index_technician].task!==null){
 					d = duration;
 					start = -1;
 				}
 				//Free slot
-				else if($scope.table[t_startslot-$scope.row_start+k][index_technician].is_holiday===false){
+				else if($scope.table[k-$scope.row_start][index_technician].is_holiday===false){
 					if(start<0) start = k;
 					d--;
 				}
@@ -375,8 +377,8 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				index_technician: index_technician,
 				tech_main_station: $scope.technicians[index_technician].tech_main_station,
 				skill_level: _skill_level,
-				start_slot: t_startslot+start,
-				end_slot: t_startslot+k-1
+				start_slot: start,
+				end_slot: k-1
 			};
 		};
 		$scope.display_cell = function(cell){
@@ -440,17 +442,6 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			}
 
 		};
-
-		// FUNCTION
-		// var saveResponseF = function(response) {
-	
-	
-		// 	//response.job = get_tech(response.job);
-		// 	//$scope.fill_table(response);
-		// };
-		// var errorResponseF = function(errorResponse) {
-		// 	$scope.error = errorResponse.data.message;
-		// };
 		$scope.put_in_plan = function(){
 			var tasks_with_priority = [];
 
@@ -469,7 +460,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			});
 			for(var j=0, len=tasks_with_priority.length; j<len; j++){
 				if(!add_task_to_plan(tasks_with_priority[j].task)){
-					remove_job(tasks_with_priority[j].task.job);
+					$scope.remove_job(tasks_with_priority[j].task.job);
 					return false;
 				}
 			}
@@ -578,7 +569,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				//will returns a slot that the filled task is complete
 				if(!add_task_to_plan(task)){
 					alert('error: ใส่งาน '+task.job.bpj_no+'/'+task.station+' ลง plan ไม่ได้');
-					remove_job(task.job);
+					$scope.remove_job(task.job);
 					return false;
 				}
 
@@ -588,10 +579,19 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			return true;
 		};
 		$scope.edit_task = function(task){
+			console.log(task);
+			$scope.show_edit = false;
+			$scope.show_edit_freeze = false;
+
 			if(task.end_slot<$scope.chosen_slot){
 				alert('งานจบไปแล้ว');
 			}
-			$scope.show_edit = true;
+			if($scope.is_freeze(task)){				
+				$scope.show_edit_freeze = true;
+			}
+			else{
+				$scope.show_edit = true;
+			}
 			var possible_tech = [];
 			for(var i in $scope.technicians){
 				var technician = $scope.technicians[i];
@@ -604,7 +604,6 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				start_slot: task.start_slot,
 				duration: task.duration,
 				note: task.note,
-				locked: task.locked,
 				skill_level: task.skill_level,
 				earliest_start_time: calc_start_time(task),
 				ref_task: task,
@@ -618,7 +617,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				t = t.prerequisite;
 			}		
 		};
-		$scope.is_moveable = function(task){
+		$scope.is_freeze = function(task){
 			if(task.start_slot <= $scope.chosen_slot) return true;
 			return false;
 		};
@@ -629,13 +628,14 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				t = t.next_task;
 			}		
 		};
-		var remove_job = function(job){
+		$scope.remove_job = function(job){
 
 			for (var i = $scope.current_tasks.length-1; i>=0; i--) {
 				var task = $scope.current_tasks[i];
 				if(task.job._id === job._id){
 					console.log('Remove Task');
 					console.log(task);
+					unfill_table(task);
 					$scope.current_tasks.splice(i,1);
 				}
 			}	
@@ -655,22 +655,13 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				alert('กรอกเวลาผิด');
 				return;
 			}
+			if(parseInt($scope.selected_task.start_slot)+parseInt($scope.selected_task.duration)-1 < $scope.chosen_slot){
+				alert('งานจบก่อนเวลาปัจจุบันไม่ได้');
+				return;
+			}
 			var task = $scope.selected_task.ref_task;
 			var old_index_tachnician = $scope.find_tech_index(task.technician.tech_id);
 			var index_technician = $scope.find_tech_index($scope.selected_task.tech_id);
-
-			if($scope.is_moveable(task)){
-				if(parseInt($scope.selected_task.start_slot)!==task.start_slot ||
-					old_index_tachnician!==index_technician){
-					alert('ห้ามย้าย');
-					return;
-				}
-			}
-			//remove this task from the current timeslot
-			for(var i = task.start_slot; i <= task.end_slot;i++){
-				$scope.table[i-$scope.row_start][old_index_tachnician].task=null;
-			}
-			
 
 			//check if it replace any task *ERROR IF REPLACE A LOCKED TASK*
 			//-> calculate the earliest slot that affect
@@ -683,18 +674,30 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			var d = duration;
 			var k;
 			var affected_slot = task.start_slot-1;
-			for(k=t_startslot-$scope.row_start; k<$scope.table.length && d>0; k++){
+
+			//remove this task from the current timeslot
+			for(var i = task.start_slot; i <= task.end_slot;i++){
+				$scope.table[i-$scope.row_start][old_index_tachnician].task=null;
+			}
+
+			$scope.unlock_task(task.next_task);
+			for(k=t_startslot; k-$scope.row_start<$scope.table.length && d>0; k++){
 			
 				//An occupied slot
-				if($scope.table[t_startslot-$scope.row_start+k][index_technician].task!==null){
-					var t = $scope.table[t_startslot-$scope.row_start+k][index_technician].task;
+				console.log(t_startslot-$scope.row_start+k);
+				if($scope.table[k-$scope.row_start][index_technician].task!==null){
+					var t = $scope.table[k-$scope.row_start][index_technician].task;
 					//opps, a locked slot -> error!
 					if(t.locked){
 						alert('error: ย้ายไปทับงานที่ Lock อยู่');
+						//put the task back
+						$scope.fill_table(task);
 						return false;
 					}
 					if(t.start_slot <= $scope.chosen_slot){
-						alert('error: ย้ายไปทับงานทีเริ่มไปแล้ว');
+						alert('error: ย้ายไปทับงานทีเริ่มไปแล้ว');						
+						//put the task back
+						$scope.fill_table(task);
 						return false;
 					}
 					//calculate the affected time
@@ -704,23 +707,26 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					d--;
 				}
 				//Free slot
-				else if($scope.table[t_startslot-$scope.row_start+k][index_technician].is_holiday===false){
+				else if($scope.table[k-$scope.row_start][index_technician].is_holiday===false){
 					if(start<0) start = k;
 					d--;
 				}
 				//Holiday Slot: do nothing
 			}
 			if(d>0){
-				alert('error: plan เต็มแล้ว');
+				alert('error: plan เต็มแล้ว');						
+				//put the task back
+				$scope.fill_table(task);
 				return false;
 			}
+
 			//update the value of this task
 			task.technician = $scope.technicians[index_technician];
-			task.start_slot = start+$scope.row_start;
+			task.start_slot = start;
 			task.duration = duration;
 			task.note = $scope.selected_task.note;
 			task.skill_level = $scope.selected_task.skill_level;
-			task.end_slot = k+$scope.row_start-1;
+			task.end_slot = k-1;
 
 			lock_task(task);
 			$scope.remove_after(affected_slot-1);			
@@ -729,10 +735,11 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			$scope.fill_table(task);
 			$scope.put_in_plan();
 			
-			$scope.show_edit = false;
+			$scope.cancel_edit_task();
 		};
 		$scope.cancel_edit_task = function(){
-			$scope.show_edit = false;
+			$scope.show_edit = false;			
+			$scope.show_edit_freeze = false;
 		};
 
 		$scope.init();

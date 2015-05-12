@@ -1,7 +1,7 @@
 <section data-ng-controller="TasksController" data-ng-init="find()">
 
     <div class="page-header">
-        <h1>Incoming Jobs (Total: {{jobs.length}})</h1>
+        <h1>Incoming Jobs (Total: {{jobs.length}}, Show first 50)</h1>
     </div>
 
     <div class="row">
@@ -33,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="job in jobs | orderBy:job_order_func | limitTo: 10">
+                <tr ng-repeat="job in jobs | orderBy:job_order_func | limitTo: 50">
                     <td>{{job.bpj_no}}</td>
                     <td>{{job.start_dt | date:'dd/MM/yyyy'}}</td>                    
                     <td>{{job.retrieve_dt | date:'dd/MM/yyyy'}}</td>
@@ -131,16 +131,13 @@
 
         <div class="col-md-1">
             <div class="controls">
-                <input type="textarea" data-ng-model="chosen_slot" id="chosen_slot" class="form-control disabled" value="0">
+                <input type="textarea" data-ng-model="chosen_slot" id="chosen_slot" class="form-control" value="0" disabled>
             </div>
         </div>
         <div class="col-md-2">
 
             <a class="btn-success btn" ng-click="chosen_slot=chosen_slot+1">
                 <i class="glyphicon glyphicon-plus"></i>
-            </a>
-            <a class="btn-danger btn" ng-click="chosen_slot=chosen_slot-1">
-                <i class="glyphicon glyphicon-minus"></i>
             </a>
         </div>
         <div class="col-md-6">
@@ -149,6 +146,29 @@
             </a>
             <a class="btn-success btn" ng-click="put_in_plan();">
                 <i class="glyphicon glyphicon-play"></i> จัดแผนใหม่
+            </a>
+        </div>
+    </div>
+    <div class="row jumbotron" ng-show="show_edit_freeze" style="margin-bottom: 20px;">
+        <div class="col-md-2">
+            <label class="control-label" for="duration">duration<br />(1 slot=30นาที)</label>
+            <div class="controls">
+                <input type="text" data-ng-model="selected_task.duration" id="duration" class="form-control" placeholder="duration">
+            </div>
+        </div>
+        <div class="col-md-2">
+
+            <label class="control-label" for="note">note</label>
+            <div class="controls">
+                <input type="textarea" data-ng-model="selected_task.note" id="note" class="form-control" placeholder="note">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <a class="btn-success btn" ng-click="save_edit_task();">
+                <i class="glyphicon glyphicon-ok"></i> ปรับเวลาและล็อค
+            </a>
+            <a class="btn-danger btn" ng-click="cancel_edit_task();">
+                <i class="glyphicon glyphicon-remove"></i> ยกเลิก
             </a>
         </div>
     </div>
@@ -190,7 +210,7 @@
         </div>
         <div class="col-md-2">
 
-            <a class="btn-danger btn" ng-click="unlock_task(selected_task.ref_task);">
+            <a class="btn-danger btn" ng-if="selected_task.ref_task.locked" ng-click="unlock_task(selected_task.ref_task);">
                 <i class="glyphicon glyphicon-lock"></i> ปลดล็อค
             </a>
             <a class="btn-success btn" ng-click="save_edit_task();">
@@ -247,8 +267,8 @@
                         ng-style="{'background-color':getBg(cell.task.job.bpj_no)}"
                         ng-click="edit_task(cell.task);">
                             {{cell.task.job.name_plate}}
-                            <i ng-if="!is_moveable(cell.task) && cell.task.locked" class="glyphicon glyphicon-lock"></i>
-                            <i ng-if="is_moveable(cell.task)" class="glyphicon glyphicon-ban-circle"></i>
+                            <i ng-if="!is_freeze(cell.task) && cell.task.locked" class="glyphicon glyphicon-lock"></i>
+                            <i ng-if="is_freeze(cell.task)" class="glyphicon glyphicon-ban-circle"></i>
                         </a>
                     </td>
                 </tr>
@@ -260,7 +280,7 @@
     <h1>Task Status (Total: {{current_task.length}})</h1>
 
     <div class="list-group">
-        <a data-ng-repeat="task in current_tasks | limitTo: 10" ng-click="edit_task(cell.task);" class="list-group-item" ng-class="task.is_in_plan ? 'list-group-item-success' : 'list-group-item-danger'">
+        <a data-ng-repeat="task in current_tasks" ng-click="edit_task(cell.task);" class="list-group-item" ng-class="task.start_slot<=chosen_slot ? 'list-group-item-success' : 'list-group-item-warning'">
 			<small class="list-group-item-text">
 				<span data-ng-bind="task.job.name_plate"></span>
                 <span data-ng-bind="task.station"></span>

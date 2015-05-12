@@ -106,6 +106,8 @@ Function:
 - station 			number
 - skill_level		number -> skill_id (FACTORY-SKILL.LEVEL)
 
+(front only): is_in_plan	bool
+
 >>>>>>>>>> LATER
 - ot
 - extra_holiday
