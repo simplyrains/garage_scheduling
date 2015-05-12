@@ -87,7 +87,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 	    			return result;
 	    		})
 	    		.then(function(result){
-	    			var n_date = 10;
+	    			var n_date = 30;
 	    			$scope.table = new Array(16*n_date);
 	    			var dateDiff = $scope.getDateDiff(initial_date, current_date);
 
@@ -238,6 +238,15 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		    var datediff = (date2.getTime() - date1.getTime()); // difference 
 		    return parseInt(datediff / (24 * 60 * 60 * 1000), 10); //Convert values days and return value      
 		};
+		$scope.job_order_func = function(job){
+			var retrieve_dt = $scope.getDateDiff(initial_date, new Date(job.retrieve_dt));
+			var work_level = job.work_level;
+			var total_time = 0;
+			for(var i in job.approx_hrs){
+				total_time+=job.approx_hrs[i].time;
+			}
+			return retrieve_dt*1000000+work_level*100000+total_time;
+		};
 		$scope.calc_date = function(slot_id){
 			//year, month, day, hours, minutes, seconds, milliseconds
 			var diff = slot_id/16;
@@ -345,8 +354,8 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 
 			if(t_startslot<$scope.row_start) t_startslot = $scope.row_start;
 			var k;
-			for(k=0; k<$scope.table.length && d>0; k++){
-			
+			for(k=0; t_startslot-$scope.row_start+k<$scope.table.length && d>0; k++){
+
 				//An occupied slot
 				if($scope.table[t_startslot-$scope.row_start+k][index_technician].task!==null){
 					d = duration;
@@ -459,8 +468,12 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				return a.priority-b.priority;
 			});
 			for(var j=0, len=tasks_with_priority.length; j<len; j++){
-				add_task_to_plan(tasks_with_priority[j].task);
+				if(!add_task_to_plan(tasks_with_priority[j].task)){
+					remove_job(tasks_with_priority[j].task.job);
+					return false;
+				}
 			}
+			return true;
 		};
 		var add_task_to_plan = function(task){
 
@@ -482,7 +495,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					results.push(result);
 				}
 			}				
-			if(results.length === 0) return -1; //impossible in this time span
+			if(results.length === 0) return false; //impossible in this time span
 
 			//Choose the best result
 			var earliest_slot = results[0].end_slot;
@@ -565,7 +578,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				//will returns a slot that the filled task is complete
 				if(!add_task_to_plan(task)){
 					alert('error: ใส่งาน '+task.job.bpj_no+'/'+task.station+' ลง plan ไม่ได้');
-
+					remove_job(task.job);
 					return false;
 				}
 
@@ -615,6 +628,27 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				t.locked =false;
 				t = t.next_task;
 			}		
+		};
+		var remove_job = function(job){
+
+			for (var i = $scope.current_tasks.length-1; i>=0; i--) {
+				var task = $scope.current_tasks[i];
+				if(task.job._id === job._id){
+					console.log('Remove Task');
+					console.log(task);
+					$scope.current_tasks.splice(i,1);
+				}
+			}	
+			for (i in $scope.current_jobs) {
+				var _job = $scope.current_jobs[i];
+				if(job._id === _job._id){					
+					console.log('Remove Job');
+					console.log(_job);
+					$scope.current_jobs.splice(i,1);
+				}
+			}	
+			alert('ยกเลิก Job : '+job.bpj_no);
+			$scope.jobs.push(job);
 		};
 		$scope.save_edit_task = function(){
 			if(parseInt($scope.selected_task.start_slot) < $scope.selected_task.earliest_start_time){
