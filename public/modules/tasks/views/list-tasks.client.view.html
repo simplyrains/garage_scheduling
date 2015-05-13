@@ -264,7 +264,7 @@
                     </td>
                     <td ng-repeat="cell in row track by $index" ng-class="cell.is_holiday ? 'danger' : '' ">
                         <a ng-if="display_cell(cell)" class="btn" style="color: white;"
-                        ng-style="{'background-color':getBg(cell.task.job.bpj_no)}"
+                        ng-style="{'background-color':cell.task.job.color}"
                         ng-click="edit_task(cell.task);">
                             {{cell.task.job.name_plate}}
                             <i ng-if="!is_freeze(cell.task) && cell.task.locked" class="glyphicon glyphicon-lock"></i>

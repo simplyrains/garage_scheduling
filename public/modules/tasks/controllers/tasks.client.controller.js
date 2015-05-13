@@ -9,7 +9,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 
 		//initial_date = 4th/May/2015
 		var initial_date = new Date(2015, 5, 1, 0, 0, 0, 0);
-		var current_date = new Date(2015, 5, 1, 0, 0, 0, 0);
+		var current_date = new Date(2015, 5, 2, 0, 0, 0, 0);
 
 		// Create new Task
 		$scope.create = function() {
@@ -87,7 +87,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 	    			return result;
 	    		})
 	    		.then(function(result){
-	    			var n_date = 120;
+	    			var n_date = 30;
 	    			$scope.table = new Array(16*n_date);
 	    			var dateDiff = $scope.getDateDiff(initial_date, current_date);
 
@@ -280,6 +280,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			}	
 		};
 		$scope.fill_table = function(task){
+			console.log(task);
 			var station = task.station;
 			var duration = task.duration;
 			var index_technician = $scope.find_tech_index(task.technician.tech_id);
@@ -396,16 +397,6 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 				new Date(job.retrieve_dt),
 				new Date(job.complete_dt)
 			);
-		};
-		$scope.getBg = function(s){
-			var ss = s.substring(s.length-3,s.length);
-			var sss = parseInt(ss);
-			var a = sss%8;
-			var b = sss%50;
-			var c = sss/100;
-			var color = '#'+(a+8).toString(16)+b.toString()+c.toString()+'AAAA';
-			color = color.substring(0,4);
-			return color;
 		};
 		$scope.movePriorityUp = function(index){
 			if(index === 0) return;
@@ -550,6 +541,14 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					$scope.jobs.splice(k, 1);
 				}
 			}	
+
+			//random color
+		    var letters = '0123456789ABCDEF'.split('');
+		    var color = '#';
+		    for (var i = 0; i < 6; i++ ) {
+		        color += letters[Math.floor(Math.random() * 16)];
+		    }
+			job.color = color;
 			$scope.current_jobs.push(job);
 
 
