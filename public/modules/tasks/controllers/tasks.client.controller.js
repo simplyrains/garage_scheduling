@@ -87,7 +87,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 	    			return result;
 	    		})
 	    		.then(function(result){
-	    			var n_date = 30;
+	    			var n_date = 120;
 	    			$scope.table = new Array(16*n_date);
 	    			var dateDiff = $scope.getDateDiff(initial_date, current_date);
 
