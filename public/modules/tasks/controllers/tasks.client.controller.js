@@ -8,8 +8,8 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		$scope.authentication = Authentication;
 
 		//initial_date = 4th/May/2015
-		var initial_date = new Date(2015, 4, 5, 0, 0, 0, 0);
-		var current_date = new Date(2015, 4, 6, 0, 0, 0, 0);
+		var initial_date = new Date(2015, 5, 1, 0, 0, 0, 0);
+		var current_date = new Date(2015, 5, 1, 0, 0, 0, 0);
 
 		// Create new Task
 		$scope.create = function() {
@@ -87,7 +87,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 	    			return result;
 	    		})
 	    		.then(function(result){
-	    			var n_date = 30;
+	    			var n_date = 120;
 	    			$scope.table = new Array(16*n_date);
 	    			var dateDiff = $scope.getDateDiff(initial_date, current_date);
 
@@ -239,13 +239,18 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 		    return parseInt(datediff / (24 * 60 * 60 * 1000), 10); //Convert values days and return value      
 		};
 		$scope.job_order_func = function(job){
+			var start_dt = $scope.getDateDiff(initial_date, new Date(job.start_dt));			
 			var retrieve_dt = $scope.getDateDiff(initial_date, new Date(job.retrieve_dt));
 			var work_level = job.work_level;
+			if(work_level == 0) work_level = 2;
+			else if(work_level === 2) work_level = 0;
+			else if(work_level === 3) work_level = 5;
+			else if(work_level === 5) work_level = 3;
 			var total_time = 0;
 			for(var i in job.approx_hrs){
 				total_time+=job.approx_hrs[i].time;
 			}
-			return retrieve_dt*1000000+work_level*100000+total_time;
+			return start_dt*1000000000+retrieve_dt*1000000+work_level*100000+total_time;
 		};
 		$scope.calc_date = function(slot_id){
 			//year, month, day, hours, minutes, seconds, milliseconds
@@ -348,6 +353,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			var _skill_level = check_skill($scope.technicians[index_technician], station);
 			// _skill_level = -1 means no skill
 			if(_skill_level === -1) return {possible: false};
+			else if(_skill_level<skill_level) return {possible: false};
 
 			//Check the time he is available
 			//check if the slot is free, if not we'll return

@@ -18,6 +18,18 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 			{id: 5, name: 'M3'},
 			{id: 6, name: 'H1~H3'}
 		];
+		var defaultHr = [
+			[2.25,	5.17,	2.84,	1.5,	1,		1,	0.33],
+			[2.75,	7.5,	3.25,	2.75,	1.5,	1,	0.33],
+			[4.5,	9.33,	4.83,	4,		2,		1,	0.33],
+			[8,		14,		6,		5,		3,		1,	0.5],
+			[16,	18,		7,		6,		4,		1,	0.5],
+			[21,	20,		8,		10,		7,		1,	0.5],
+			[32,	22,		8,		16,		8,		2,	1],
+			[34,	24,		12,		24,		9,		2,	1],
+			[40,	24,		12,		32,		9,		2,	1]
+		];
+
 		$scope.approx_hrs = [];
 		for(var i=1; i<=7; i++) $scope.approx_hrs.push({
 			station: i,
@@ -224,6 +236,16 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 			if(tshr<=75) return 4;
 			if(tshr<=95) return 5;
 			else return 6;
+		};
+		$scope.refill_hrs = function(tshr, arr){
+			var level = $scope.calculate_level(tshr);
+			if(tshr>110) level = 7;
+			if(tshr>130) level = 8;
+			console.log('filled, level = '+level);
+			var result = defaultHr[level];
+			for(var i in result){
+				arr[i].time = result[i];
+			}
 		};
 	}
 ]);

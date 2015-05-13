@@ -142,7 +142,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-4">ชั่วโมงงาน</label>
                                         <div class="col-md-8">
-                                            <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
+                                            <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" ng-change="refill_hrs(topserv_hr, approx_hrs)" required>
                                             <span class="help-block">ประเมินจากระบบ TopServ</span>
 
                                         </div>
