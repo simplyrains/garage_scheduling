@@ -7,6 +7,6 @@ angular.module('jobs').run(['Menus',
 		Menus.addMenuItem('topbar', 'SA Menu', 'jobs', 'dropdown', '/jobs(/create)?');
 		Menus.addSubMenuItem('topbar', 'jobs', 'ติดตามสถานะรถ', 'jobs');
 		Menus.addSubMenuItem('topbar', 'jobs', 'กรอกข้อมูลใบจ้อบ', 'jobs/create');
-		Menus.addSubMenuItem('topbar', 'jobs', 'โทรติดต่อลูกค้า', 'jobs/tel');		
+		//Menus.addSubMenuItem('topbar', 'jobs', 'โทรติดต่อลูกค้า', 'jobs/tel');		
 	}
 ]);

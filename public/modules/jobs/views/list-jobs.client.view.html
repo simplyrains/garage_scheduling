@@ -1,20 +1,58 @@
 <section data-ng-controller="JobsController" data-ng-init="find()">
+ 
     <div class="page-header">
-        <h1>Jobs</h1>
+        <h1>งานทั้งหมด (รวม: {{jobs.length}})</h1>
     </div>
-    <div class="list-group">
-        <a data-ng-repeat="job in jobs" data-ng-href="#!/jobs/{{job._id}}" class="list-group-item">
-            {{job.bpj_no}} ------- {{workTypeChoice[job.work_level].name}}
-			<small class="list-group-item-text">
-			     <br />Posted on
-				<span data-ng-bind="job.created | date:'medium'"></span>
-				by
-				<span data-ng-bind="job.user.displayName"></span>
-			</small>
-			<h4 class="list-group-item-heading" data-ng-bind="job.name"></h4>
-        </a>
+
+    <div class="row">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        BPJ No.
+                    </th>
+                    <th>
+                        ทะเบียน
+                    </th>
+                    <th>
+                        SA
+                    </th>
+                    <th>
+                        ชื่อลูกค้า
+                    </th>
+                    <th>
+                        เบอร์โทรลูกค้า
+                    </th>
+                    <th>
+                        วันส่งมอบ
+                    </th>
+                    <th>
+                        ประเภทรถ
+                    </th>
+                    <th>
+                        รายละเอียด 
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="job in jobs | orderBy:job_order_func">
+                    <td>{{job.bpj_no}}</td>                    
+                    <td>{{job.name_plate}}</td>
+                    <td>{{job.sa_id}}</td>
+                    <td>{{getcar(job.name_plate).customer_name}}</td>
+                    <td>{{getcar(job.name_plate).customer_tel}}</td>
+                    <td>{{job.retrieve_dt | date:'dd/MM/yyyy'}}</td>
+                    <td>{{workTypeChoice[job.work_level].name}}</td>
+                    <td>                        
+                        <a class="btn btn-primary" href="/#!/jobs/{{job._id}}/edit">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="alert alert-warning text-center" data-ng-hide="!jobs.$resolved || jobs.length">
+        <div class="alert alert-warning text-center" data-ng-hide="!jobs.$resolved || jobs.length">
     	No Jobs yet, why don't you <a href="/#!/jobs/create">create one</a>?
     </div>
 </section>

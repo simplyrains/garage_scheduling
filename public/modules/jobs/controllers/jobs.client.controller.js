@@ -59,6 +59,14 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				return '';
 			}
 		};
+		$scope.getcar = function(n){
+			for(var i in $scope.cars){
+				if($scope.cars[i].name_plate === n){
+					return $scope.cars[i];
+				}
+			}
+			return {};
+		};
 		$scope.checkcar = function(n){
 			console.log(n);
 			$scope.car_id = $scope.get_car_id(n);
