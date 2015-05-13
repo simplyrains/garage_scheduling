@@ -242,7 +242,7 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			var start_dt = $scope.getDateDiff(initial_date, new Date(job.start_dt));			
 			var retrieve_dt = $scope.getDateDiff(initial_date, new Date(job.retrieve_dt));
 			var work_level = job.work_level;
-			if(work_level == 0) work_level = 2;
+			if(work_level === 0) work_level = 2;
 			else if(work_level === 2) work_level = 0;
 			else if(work_level === 3) work_level = 5;
 			else if(work_level === 5) work_level = 3;
