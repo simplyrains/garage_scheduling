@@ -1,32 +1,32 @@
 <section data-ng-controller="CarsController" data-ng-init="findOne()">
     <div class="page-header">
-        <h1>Edit Car</h1>
+        <h1>แก้ไขรถ {{car.name_plate}}</h1>
     </div>
     <div class="col-md-12">
         <form class="form-horizontal" data-ng-submit="update()" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <label class="control-label" for="customer_name">customer_name</label>
+                    <label class="control-label" for="customer_name">ชื่อลูกค้า</label>
                     <div class="controls">
                         <input type="text" data-ng-model="car.customer_name" id="customer_name" class="form-control" placeholder="customer_name" required>
                     </div>
-                    <label class="control-label" for="customer_tel">customer_tel</label>
+                    <label class="control-label" for="customer_tel">เบอร์โทรศัพท์ลูกค้า</label>
                     <div class="controls">
                         <input type="text" data-ng-model="car.customer_tel" id="customer_tel" class="form-control" placeholder="customer_tel" required>
                     </div>
-                    <label class="control-label" for="name_plate">name_plate</label>
+                    <label class="control-label" for="name_plate">ทะเบียนรถ</label>
                     <div class="controls">
-                        <input type="text" data-ng-model="car.name_plate" id="name_plate" class="form-control" placeholder="name_plate" required>
+                        <input type="text" data-ng-model="car.name_plate" id="name_plate" class="form-control" placeholder="name_plate" disabled>
                     </div>
-                    <label class="control-label" for="model_id">model_id</label>
+                    <label class="control-label" for="model_id">รหัสรุ่น</label>
                     <div class="controls">
                         <input type="text" data-ng-model="car.model_id" id="model_id" class="form-control" placeholder="model_id" required>
                     </div>
-                    <label class="control-label" for="colour_id">colour_id</label>
+                    <label class="control-label" for="colour_id">รหัสสี</label>
                     <div class="controls">
                         <input type="text" data-ng-model="car.colour_id" id="colour_id" class="form-control" placeholder="colour_id" required>
                     </div>
-                    <label class="control-label" for="tech_main_station">Insurance</label>
+                    <label class="control-label" for="tech_main_station">ประกัน</label>
                     <div class="controls">
                         <select ng-model="car.insurance" ng-options="insurance.insurance_name as insurance.insurance_displayname for insurance in insurances">
                           <option value="">-- เลือกประกัน --</option>
