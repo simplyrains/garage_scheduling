@@ -1,128 +1,259 @@
 <section data-ng-controller="JobsController">
     <div class="page-header">
-        <h1>New Job</h1>
+        <h1>เปิดใบจ้อบ</h1>
     </div>
     <div class="col-md-12">
-        <form class="form-horizontal" data-ng-submit="create()" novalidate>
-            <fieldset>
+        <div class="portlet box">
+            <div class="portlet-body form">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" data-ng-submit="create()" novalidate>
+                    <div class="form-body">
+                        <h3 class="form-section">ข้อมูลใบจ้อบ</h3>
+                        <div class="jumbotron">
+                            <div class="row">
 
-                    <label class="control-label" for="bpj_no">bpj_no</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="bpj_no" id="bpj_no" class="form-control" placeholder="bpj_no" required>
-                    </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">เลขที่ใบจ้อบ</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="bpj_no" id="bpj_no" class="form-control" placeholder="bpj_no" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">BPE</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="bpe_no" id="bpe_no" class="form-control" placeholder="bpe_no" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                            </div>
 
-                    <label class="control-label" for="bpe_no">bpe_no</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="bpe_no" id="bpe_no" class="form-control" placeholder="bpe_no" required>
-                    </div>
+                            <div class="row clearfix">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">วันที่รถจอด</label>
+                                        <div class="col-md-8">
+                                            <input type="date" data-ng-model="park_dt" id="park_dt" class="form-control" placeholder="start_dt" required>
+                                            <span class="help-block">วันที่รถเข้าศูนย์ ให้ตรงกับใบจ้อบในระบบ TopServ </span>
+                                        </div>
 
-                    <label class="control-label" for="start_dt">start_dt</label>
-                    <div class="controls">
-                        <input type="date" data-ng-model="start_dt" id="start_dt" class="form-control" placeholder="start_dt" required>
-                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                            <!--/row-->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">ประเภทรถ</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="car_type" ng-options="c as c for c in carTypeChoice">
+                                                <option value="">-- เลือก --</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">ทะเบียนรถ</label>                                    
 
-                    <label class="control-label" for="retrieve_dt">retrieve_dt</label>
-                    <div class="controls">
-                        <input type="date" data-ng-model="retrieve_dt" id="retrieve_dt" class="form-control" placeholder="retrieve_dt" required>
-                    </div>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="name_plate" id="name_plate" class="form-control" placeholder="ทะเบียนรถ" ng-change="checkcar(name_plate)" required>                                  
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                            </div>
+                            <!--/row-->
+                        </div>
+                        <h3 class="form-section">ข้อมูลรถ</h3>
+                        <div class="jumbotron" ng-show="!name_plate">
+                            กรุณากรอกทะเบียนรถ
+                        </div>
+                        <div class="jumbotron" ng-show="!is_new_car">
+                            <a class="btn btn-warning" target="_blank" href="/#!/cars/{{car_id}}/edit">แก้ไขข้อมูลรถ</a>
+                        </div>
+                        <div class="jumbotron" ng-show="is_new_car&&name_plate.length>0">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">ชื่อลูกค้า</label>
+                                        <div class="col-md-8">
+                                             <input type="text" data-ng-model="customer_name" id="customer_name" class="form-control" placeholder="ชื่อลูกค้า" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">เบอร์โทรลูกค้า</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="customer_tel" id="customer_tel" class="form-control" placeholder="เบอร์โทรลูกค้า" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                            </div>
 
-                    <label class="control-label" for="sa_id">sa_id</label>
-                    <div class="controls">
-                        <select ng-model="sa_id" ng-options="sa.sa_nickname as sa.sa_nickname for sa in sas">
-                          <option value="">-- เลือกทะเบียนรถ --</option>
-                        </select>                    </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">รุ่นรถ</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="model_id" id="model_id" class="form-control" placeholder="รุ่นรถ" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">สีรถ</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="colour_id" id="colour_id" class="form-control" placeholder="รหัสสีรถ" required>
+                                            <span class="help-block">ระบุเป็น Code ของสี</span>
 
-                    <label class="control-label" for="name_plate">name_plate</label>
-                    <div class="controls">
-                        <select ng-model="name_plate" ng-options="car.name_plate as car.name_plate for car in cars">
-                          <option value="">-- เลือกทะเบียนรถ --</option>
-                        </select>
-                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/span-->
+                            </div>
+                            <div class="rox clearfix">
+                                <div class="col-md-6">
+                                    <label class="control-label col-md-4">ประกัน</label>
+                                    <div class="col-md-8 form-group">
+                                        <select ng-model="insurance" class="form-control" ng-options="insurance.insurance_name as insurance.insurance_displayname for insurance in insurances">
+                                          <option value="">-- เลือกประกัน --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="form-section">ข้อมูลการซ่อม</h3>
+                        <div class="jumbotron">
+                            <div class="row">
+                                <!--/span-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">ชั่วโมงงาน</label>
+                                        <div class="col-md-8">
+                                            <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
+                                            <span class="help-block">ประเมินจากระบบ TopServ</span>
 
-                    <label class="control-label" for="car_type">car_type</label>
-                    <div class="controls">
-                        <select ng-model="car_type" ng-options="c as c for c in carTypeChoice">
-                            <option value="">-- เลือก --</option>
-                        </select>
-                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <label class="control-label col-md-4">Work Type</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" placeholder="คำนวณจากชั่วโมง TopServ" ng-model="workTypeChoice[calculate_level(topserv_hr)].name" disabled>
+                                        </div>
+                                </div>
+                                <!--/span-->
+                            </div>
+                            <h4 class="form-section">ชั่วโมงประเมินงานซ่อมจากหัวหน้าช่าง</h4>
 
-                    <label class="control-label" for="topserv_hr">topserv_hr</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="topserv_hr" id="topserv_hr" class="form-control" placeholder="topserv_hr" required>
-                    </div>
-
-                    <label class="control-label" for="work_type">work_type -> {{workTypeChoice[calculate_level(topserv_hr)].name}}</label>
-                    <br />
-                    <br />
-
-                    <label class="control-label" for="backorder_parts">backorder_part</label>
-                    <button type="button" ng-click="addBackOrderPartInputC()">เพิ่ม</button>
-
-                    <div class="controls row">
-                        <div class="col-md-3" ng-repeat="backorder_part in backorder_parts track by $index">
-
-
-                            <label class="control-label" for="backorder_part.name">รายละเอียด</label>
-                            <input type="text" data-ng-model="backorder_part.name" class="form-control" placeholder="รายละเอียด">               
-
-                            <label class="control-label" for="backorder_part.station">สถานี</label>
-                            <select ng-model="backorder_part.station" ng-options="factory.id as factory.name for factory in factoryChoice">
-                              <option value="">-- เลือกสถานีที่ใช้ --</option>
-                            </select>
-
-                            <label class="control-label" for="backorder_part.arrival">วันที่ได้รับ</label>
-                            <input type="date" data-ng-model="backorder_part.arrival" class="form-control" placeholder="วันที่">
-                            <br /> <br />
+                            <div class="row controls">
+                                <div class="col-md-3" ng-repeat="approx_hr in approx_hrs track by $index">
+                                        <label class="control-label col-md-8">{{factoryChoice[approx_hr.station-1].name}}</label>
+                                        <div class="col-md-4">
+                                            <input type="text" data-ng-model="approx_hr.time" class="form-control" placeholder="ชั่วโมง">               
+                                        </div>
+                                </div>
+                                <!--/span-->
+                            </div>
                         </div>
 
+                        <h3 class="form-section">ข้อมูลเพิ่มเติม</h3>
+                        <div class="jumbotron">
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <label class="control-label col-md-4">วันที่พร้อมขึ้นซ่อม</label>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" data-ng-model="start_dt" id="start_dt" class="form-control" placeholder="start_dt" required>
+
+                                            <span class="help-block">วันที่รถพรอ้มขึ้นซ่อมได้</span>
+
+                                        </div>                                          
+                                    </div>
+                                    <div class="row">
+                                        <label class="control-label col-md-4">วันส่งมอบ</label>
+                                        <div class="col-md-8 form-group">
+                                            <input type="date" data-ng-model="retrieve_dt" id="retrieve_dt" class="form-control" placeholder="retrieve_dt" required>
+
+                                            <span class="help-block">วันที่นัดลูกค้ามารับรถ</span>
+
+                                        </div>                                          
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <label class="control-label col-md-4">คำนวณวันที่คาดว่าจะแล้วเสร็จ</label>
+                                        <div class="col-md-8 form-group">
+                                            <a class="btn btn-warning" id="duedate" ng-click="calcduedate()">
+                                                คำนวณ Due Date <i class="fa fa-share"></i>
+                                            </a>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <h4 class="form-section">อะไหล่ที่ต้องสั่งเพิ่ม</h4>
+                            <a class="btn btn-success" ng-click="addBackOrderPartInputC()">เพิ่ม</a>
+                            <div class="controls row">
+                                <div class="col-md-3" ng-repeat="backorder_part in backorder_parts track by $index">
+
+
+                                    <label class="control-label" for="backorder_part.name">รายละเอียด</label>
+                                    <input type="text" data-ng-model="backorder_part.name" class="form-control" placeholder="รายละเอียด">               
+
+                                    <label class="control-label" for="backorder_part.station">สถานี</label>
+                                    <select class="form-control" ng-model="backorder_part.station" ng-options="factory.id as factory.name for factory in factoryChoice">
+                                      <option value="">-- เลือกสถานีที่ใช้ --</option>
+                                    </select>
+                                    <br />
+                                    <label class="control-label" for="backorder_part.arrival">วันที่ได้รับ</label>
+                                    <input type="date" data-ng-model="backorder_part.arrival" class="form-control" placeholder="วันที่">
+                                    <br /> <br />
+                                    <a class="btn btn-danger" ng-click="removeBackOrderPartInputC($index)">ยกเลิก</a>
+
+                                </div>
+
+                            </div>
                     </div>
-
-
-                    <label class="control-label" for="tel_info">tel_info</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="tel_info" id="tel_info" class="form-control" placeholder="tel_info" required>
                     </div>
-
-
-                    <label class="control-label" for="tel_details">tel_detail</label>
-                    <button type="button" ng-click="addTelDetailInputC()">เพิ่ม</button>
-
-                    <div class="controls row">
-                        <div class="col-md-3" ng-repeat="tel_detail in tel_details track by $index">
-                            <label class="control-label" for="tel_detail.tel_time">วันที่</label>
-                            <input type="datetime-local" data-ng-model="tel_detail.tel_time" class="form-control">
-
-                            <label class="control-label" for="tel_detail.tel_desc">รายละเอียด</label>
-                            <input type="text" data-ng-model="tel_detail.tel_desc" class="form-control" placeholder="รายละเอียด">   
-                             <br /> <br />
-            
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div data-ng-show="error" class="alert alert-danger">
+                                    <strong data-ng-bind="error"></strong>
+                                </div>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <div class="controls">
+                                    <select class="form-control" ng-model="sa_id" ng-options="sa.sa_nickname as sa.sa_nickname for sa in sas">
+                                      <option value="">-- เลือก SA ที่รับผิดชอบ --</option>
+                                    </select>
+                                </div>
 
-                    </div>
 
-
-
-                    <label class="control-label" for="tel_details">เวลาประเมินจากหัวหน้าช่าง</label>
-
-                    <div class="controls row">
-                        <div class="col-md-1" ng-repeat="approx_hr in approx_hrs track by $index">
-                            <label class="control-label">{{factoryChoice[approx_hr.station-1].name}}</label>
-                            <input type="text" data-ng-model="approx_hr.time" class="form-control" placeholder="ชั่วโมง">               
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <button class="btn btn-success btn-lg" type="submit">ยืนยัน</button>
+                            </div>
                         </div>
-
                     </div>
-
-
-
-
-
-                <div class="form-group">
-                    <input type="submit" class="btn btn-default">
-                </div>
-				<div data-ng-show="error" class="text-danger">
-					<strong data-ng-bind="error"></strong>
-				</div>
-            </fieldset>
-        </form>
+                </form>
+                <!-- END FORM-->
+            </div>
+        </div>
     </div>
+
 </section>

@@ -30,6 +30,9 @@ var JobSchema = new Schema({
 	retrieve_dt: {
 		type: Date
 	},
+	park_dt: {
+		type: Date
+	},
 	sa_id: {
 		type: String,
 		required: 'Please fill SA ID'

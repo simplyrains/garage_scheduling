@@ -1,12 +1,13 @@
 'use strict';
 
 // Jobs controller
-angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Jobs','Sas','Cars',
-	function($scope, $stateParams, $location, Authentication, Jobs, Sas, Cars) {
+angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Jobs','Sas','Cars','Insurances',
+	function($scope, $stateParams, $location, Authentication, Jobs, Sas, Cars, Insurances) {
 		$scope.authentication = Authentication;
 
 		$scope.sas = Sas.query();
 		$scope.cars = Cars.query();
+		$scope.insurances = Insurances.query();
 		$scope.carTypeChoice = ['ทั่วไป', 'มีรายการซ่อมเพิ่มเติม', 'งานตีกลับภายนอก', 'เอาออกจากแผนชั่วคราว', 'รถไม่จอด', 'ถอดชิ้นส่วนทิ้งไว้'];
 		$scope.workTypeChoice = [
 			{id: 0, name: 'L1'},
@@ -33,9 +34,33 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 			{id: 7, name: 'เก็บงาน'}
 		];
 
+		$scope.is_new_car = true;
 		// For Create
 		$scope.backorder_parts = [];
 		$scope.tel_details = [];
+		$scope.car_id = '';
+		$scope.get_car_id = function(n){
+			for(var i in $scope.cars){
+				if($scope.cars[i].name_plate === n){
+					return $scope.cars[i]._id;
+				}					
+				return '';
+			}
+		};
+		$scope.checkcar = function(n){
+			console.log(n);
+			$scope.car_id = $scope.get_car_id(n);
+			if($scope.car_id === ''){
+				$scope.is_new_car = true;
+				return true;
+			}
+			$scope.is_new_car = false;
+			console.log($scope.car_id);
+			return false;
+		};
+		$scope.calcduedate = function(){
+			alert('ระบบยังไม่สามารถคำนวณได้');
+		};
 		$scope.addBackOrderPartInputC = function(){
 			$scope.backorder_parts.push({
 				name: '',
@@ -43,11 +68,8 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				arrival: new Date()
 			});
 		};
-		$scope.addTelDetailInputC = function(){
-			$scope.tel_details.push({
-				tel_desc: '',
-				tel_time: new Date()
-			});
+		$scope.removeBackOrderPartInputC = function(i){
+			$scope.backorder_parts.splice(i,1);
 		};
 
 		// For Edit
@@ -58,11 +80,17 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				arrival: new Date()
 			});
 		};
+		$scope.removeBackOrderPartInputE = function(i){
+			$scope.job.backorder_parts.splice(i,1);
+		};
 		$scope.addTelDetailInputE = function(){
 			$scope.job.tel_details.push({
 				tel_desc: '',
 				tel_time: new Date()
 			});
+		};
+		$scope.removeTelDetailInputE = function(i){
+			$scope.job.tel_details.splice(i,1);
 		};
 
 		// Create new Job
@@ -72,6 +100,7 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				bpj_no: this.bpj_no,
 				bpe_no: this.bpe_no,
 				start_dt: this.start_dt,
+				park_dt: this.park_dt,
 				retrieve_dt: this.retrieve_dt,
 				sa_id: this.sa_id,
 				name_plate: this.name_plate,
@@ -83,12 +112,42 @@ angular.module('jobs').controller('JobsController', ['$scope', '$stateParams', '
 				tel_info: this.tel_info,
 				approx_hrs: this.approx_hrs
 			});
+			var car = new Cars ({
+				name: this.name,
+				customer_name: this.customer_name,
+				customer_tel: this.customer_tel,
+				insurance: this.insurance,
+				name_plate: this.name_plate,
+				model_id: this.model_id,
+				colour_id: this.colour_id
+			});
 
 			// Redirect after save
+			console.log('Save Job:');
+			console.log(job);
 			job.$save(function(response) {
-				$location.path('jobs/' + response._id);
+				// Redirect after save
+				
+				if($scope.is_new_car){
+					console.log('Save Car:');
+					console.log(car);
+					car.$save(function(response) {
+						$location.path('jobs/' + response._id);
+					}, function(errorResponse) {
+						$scope.error = errorResponse.data.message;
+					});
+				}
+				else $location.path('jobs/' + response._id);
 
 				// Clear form fields
+				$scope.name = '';
+				$scope.customer_name = '';				
+				$scope.customer_tel = '';					
+				$scope.insurance = '';				
+				$scope.name_plate = '';				
+				$scope.model_id = '';			
+				$scope.colour_id = '';
+
 				$scope.name = '';
 				$scope.bpj_no = '';          // this.bpj_no,
 				$scope.bpe_no = '';          // this.bpe_no,

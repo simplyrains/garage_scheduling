@@ -1,0 +1,20 @@
+<section data-ng-controller="JobsController" data-ng-init="find()">
+    <div class="page-header">
+        <h1>Jobs ธำส</h1>
+    </div>
+    <div class="list-group">
+        <a data-ng-repeat="job in jobs" data-ng-href="#!/jobs/{{job._id}}" class="list-group-item">
+            {{job.bpj_no}} ------- {{workTypeChoice[job.work_level].name}}
+			<small class="list-group-item-text">
+			     <br />Posted on
+				<span data-ng-bind="job.created | date:'medium'"></span>
+				by
+				<span data-ng-bind="job.user.displayName"></span>
+			</small>
+			<h4 class="list-group-item-heading" data-ng-bind="job.name"></h4>
+        </a>
+    </div>
+    <div class="alert alert-warning text-center" data-ng-hide="!jobs.$resolved || jobs.length">
+    	No Jobs yet, why don't you <a href="/#!/jobs/create">create one</a>?
+    </div>
+</section>
