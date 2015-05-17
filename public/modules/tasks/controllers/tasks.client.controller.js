@@ -661,11 +661,11 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 					alert('กรอกเวลาผิด');
 					return;
 				}
+			}
 				if(parseInt($scope.selected_task.start_slot)+parseInt($scope.selected_task.duration)-1 < $scope.chosen_slot){
 					alert('งานจบก่อนเวลาปัจจุบันไม่ได้');
 					return;
 				}
-			}
 			var task = $scope.selected_task.ref_task;
 			var old_index_tachnician = $scope.find_tech_index(task.technician.tech_id);
 			var index_technician = $scope.find_tech_index($scope.selected_task.tech_id);
