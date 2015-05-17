@@ -656,13 +656,15 @@ angular.module('tasks').controller('TasksController', ['$scope', '$stateParams',
 			$scope.jobs.push(job);
 		};
 		$scope.save_edit_task = function(){
-			if(parseInt($scope.selected_task.start_slot) < $scope.selected_task.earliest_start_time){
-				alert('กรอกเวลาผิด');
-				return;
-			}
-			if(parseInt($scope.selected_task.start_slot)+parseInt($scope.selected_task.duration)-1 < $scope.chosen_slot){
-				alert('งานจบก่อนเวลาปัจจุบันไม่ได้');
-				return;
+			if(!$scope.is_freeze($scope.selected_task.ref_task)){
+				if(parseInt($scope.selected_task.start_slot) < $scope.selected_task.earliest_start_time){
+					alert('กรอกเวลาผิด');
+					return;
+				}
+				if(parseInt($scope.selected_task.start_slot)+parseInt($scope.selected_task.duration)-1 < $scope.chosen_slot){
+					alert('งานจบก่อนเวลาปัจจุบันไม่ได้');
+					return;
+				}
 			}
 			var task = $scope.selected_task.ref_task;
 			var old_index_tachnician = $scope.find_tech_index(task.technician.tech_id);
